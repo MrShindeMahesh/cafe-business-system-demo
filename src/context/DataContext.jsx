@@ -47,7 +47,7 @@ export const DataProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('bb_customers', JSON.stringify(customers));
   }, [customers]);
-  
+
   useEffect(() => {
     localStorage.setItem('bb_bills', JSON.stringify(bills));
   }, [bills]);
@@ -72,13 +72,39 @@ export const DataProvider = ({ children }) => {
       status: 'NEW',
       createdAt: new Date().toISOString(),
     };
+
+    // 1. Add order to state
     setOrders((prev) => [newOrder, ...prev]);
-    
-    // Update table status
-    setTables(prev => prev.map(t => 
+
+    // 2. Update table status to Occupied
+    setTables(prev => prev.map(t =>
       t.id === orderData.tableId ? { ...t, status: 'Occupied' } : t
     ));
-    
+
+    // 3. Update or Create Customer in the Customer List
+    if (orderData.customerPhone && orderData.customerPhone !== 'N/A') {
+      setCustomers(prev => {
+        const existingCustomer = prev.find(c => c.phone === orderData.customerPhone);
+        if (existingCustomer) {
+          // Update existing customer stats
+          return prev.map(c => c.phone === orderData.customerPhone
+            ? { ...c, orders: c.orders + 1, totalSpent: c.totalSpent + orderData.total, lastVisit: new Date().toISOString() }
+            : c
+          );
+        } else {
+          // Add brand new customer
+          return [...prev, {
+            id: 'c' + Date.now(),
+            name: orderData.customerName,
+            phone: orderData.customerPhone,
+            orders: 1,
+            totalSpent: orderData.total,
+            lastVisit: new Date().toISOString()
+          }];
+        }
+      });
+    }
+
     return newOrder;
   };
 
@@ -87,7 +113,7 @@ export const DataProvider = ({ children }) => {
       prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
     );
   };
-  
+
   const requestBill = (tableId) => {
     const activeOrder = orders.find(o => o.tableId === tableId && o.status !== 'SERVED');
     const newBill = {
