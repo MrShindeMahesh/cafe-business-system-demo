@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Layers } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 
 export default function MenuManagement() {
-  const { menu, setMenu } = useData();
+  const { menu, setMenu, inventory = [] } = useData();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [newItem, setNewItem] = useState({
@@ -11,8 +11,11 @@ export default function MenuManagement() {
     category: '',
     price: '',
     description: '',
-    image: ''
+    image: '',
+    recipe: [] // Array of { inventoryId, amount }
   });
+
+  const [currentIngredient, setCurrentIngredient] = useState({ inventoryId: '', amount: 1 });
 
   const toggleAvailability = (id) => {
     setMenu(menu.map(item => item.id === id ? { ...item, available: !item.available } : item));
@@ -24,10 +27,36 @@ export default function MenuManagement() {
     }
   };
 
+  const handleAddIngredientToRecipe = () => {
+    if (!currentIngredient.inventoryId) return;
+    const selectedInv = inventory.find(i => i.id === currentIngredient.inventoryId);
+    if (!selectedInv) return;
+
+    // Prevent duplicate entries of the same inventory item in the recipe
+    if (newItem.recipe.some(r => r.inventoryId === currentIngredient.inventoryId)) return;
+
+    setNewItem({
+      ...newItem,
+      recipe: [...newItem.recipe, {
+        inventoryId: currentIngredient.inventoryId,
+        name: selectedInv.name,
+        unit: selectedInv.unit,
+        amount: Number(currentIngredient.amount) || 1
+      }]
+    });
+    setCurrentIngredient({ inventoryId: '', amount: 1 });
+  };
+
+  const handleRemoveIngredient = (inventoryId) => {
+    setNewItem({
+      ...newItem,
+      recipe: newItem.recipe.filter(r => r.inventoryId !== inventoryId)
+    });
+  };
+
   const handleAddItem = (e) => {
     e.preventDefault();
 
-    // Automatically attach smart category-based modifiers so customers can customize them
     const isBeverage = ['Coffee', 'Cold Drinks', 'Beverages'].includes(newItem.category);
 
     const itemToAdd = {
@@ -38,6 +67,7 @@ export default function MenuManagement() {
       description: newItem.description,
       image: newItem.image || 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=500&q=80',
       available: true,
+      recipe: newItem.recipe || [], // Multi-ingredient recipe array
       variants: isBeverage ? [{ name: 'Size', options: [{ name: 'Regular', price: 0 }, { name: 'Large', price: 40 }] }] : [],
       addons: isBeverage
         ? [{ name: 'Extra Shot', price: 50 }, { name: 'More Sugar / Sweet', price: 0 }]
@@ -45,7 +75,7 @@ export default function MenuManagement() {
     };
 
     setMenu([itemToAdd, ...menu]);
-    setNewItem({ name: '', category: '', price: '', description: '', image: '' });
+    setNewItem({ name: '', category: '', price: '', description: '', image: '', recipe: [] });
     setIsModalOpen(false);
   };
 
@@ -54,7 +84,7 @@ export default function MenuManagement() {
       <div className="admin-page-header">
         <div>
           <h2 className="admin-page-title">Menu Management</h2>
-          <p className="admin-page-sub">Manage your items, pricing, and availability.</p>
+          <p className="admin-page-sub">Manage your items, multi-ingredient recipes, and availability.</p>
         </div>
         <button
           className="btn btn-primary btn-sm"
@@ -68,9 +98,10 @@ export default function MenuManagement() {
         <table className="data-table">
           <thead>
             <tr>
-              <th style={{ width: '40%' }}>Item</th>
+              <th style={{ width: '30%' }}>Item</th>
               <th>Category</th>
               <th>Price</th>
+              <th>Recipe / Stock Deductions</th>
               <th>Status</th>
               <th style={{ textAlign: 'right' }}>Actions</th>
             </tr>
@@ -91,6 +122,17 @@ export default function MenuManagement() {
                   <span className="badge badge-accent">{item.category}</span>
                 </td>
                 <td style={{ fontWeight: 700, color: 'var(--color-primary)' }}>₹{item.price}</td>
+                <td style={{ fontSize: '.8125rem', color: 'var(--color-text-secondary)' }}>
+                  {item.recipe && item.recipe.length > 0 ? (
+                    item.recipe.map((r, idx) => (
+                      <div key={idx}>• {r.name}: <b>-{r.amount} {r.unit}</b></div>
+                    ))
+                  ) : item.inventoryId ? (
+                    <div>• <b>-{item.stockUsed || 1} unit</b></div>
+                  ) : (
+                    <span style={{ color: 'var(--color-text-muted)' }}>No ingredients linked</span>
+                  )}
+                </td>
                 <td>
                   <button
                     onClick={() => toggleAvailability(item.id)}
@@ -113,17 +155,18 @@ export default function MenuManagement() {
 
       {isModalOpen && (
         <div className="modal-overlay" style={{ zIndex: 999, alignItems: 'center' }}>
-          <div className="card animate-scale-up" style={{ width: '100%', maxWidth: '500px', padding: '1.5rem', background: 'var(--color-surface)' }}>
+          <div className="card animate-scale-up" style={{ width: '100%', maxWidth: '550px', padding: '1.5rem', background: 'var(--color-surface)', maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem' }}>Add New Item</h3>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem' }}>Add Menu Item & Recipe</h3>
               <button className="action-icon-btn" onClick={() => setIsModalOpen(false)}><X size={20} /></button>
             </div>
 
             <form onSubmit={handleAddItem} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Item Name</label>
-                <input required type="text" value={newItem.name} onChange={e => setNewItem({ ...newItem, name: e.target.value })} placeholder="e.g., Caramel Macchiato" />
+                <input required type="text" value={newItem.name} onChange={e => setNewItem({ ...newItem, name: e.target.value })} placeholder="e.g., Cappuccino" />
               </div>
+
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <div style={{ flex: 1 }}>
                   <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Category</label>
@@ -134,17 +177,64 @@ export default function MenuManagement() {
                   <input required type="number" min="0" value={newItem.price} onChange={e => setNewItem({ ...newItem, price: e.target.value })} placeholder="e.g., 149" />
                 </div>
               </div>
+
+              {/* MULTI-INGREDIENT RECIPE BUILDER */}
+              <div style={{ background: 'rgba(0,0,0,0.02)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
+                <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '.4rem', marginBottom: '.5rem' }}>
+                  <Layers size={14} /> Recipe Ingredient Deductions
+                </label>
+                <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginBottom: '.75rem' }}>Add all inventory items consumed when 1 unit of this menu item is ordered.</p>
+
+                <div style={{ display: 'flex', gap: '.5rem', marginBottom: '.75rem' }}>
+                  <select
+                    value={currentIngredient.inventoryId}
+                    onChange={e => setCurrentIngredient({ ...currentIngredient, inventoryId: e.target.value })}
+                    style={{ flex: 2, padding: '.5rem', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', background: '#fff', fontSize: '.875rem' }}
+                  >
+                    <option value="">-- Select Ingredient --</option>
+                    {inventory.map(inv => (
+                      <option key={inv.id} value={inv.id}>{inv.name} ({inv.quantity} {inv.unit} left)</option>
+                    ))}
+                  </select>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={currentIngredient.amount}
+                    onChange={e => setCurrentIngredient({ ...currentIngredient, amount: e.target.value })}
+                    placeholder="Qty"
+                    style={{ flex: 1, padding: '.5rem', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', background: '#fff', fontSize: '.875rem' }}
+                  />
+                  <button type="button" className="btn btn-primary btn-sm" onClick={handleAddIngredientToRecipe}>Add</button>
+                </div>
+
+                {newItem.recipe.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.375rem' }}>
+                    {newItem.recipe.map(r => (
+                      <div key={r.inventoryId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', padding: '.4rem .75rem', borderRadius: '4px', border: '1px solid var(--color-border)', fontSize: '.875rem' }}>
+                        <span>{r.name} (<b>-{r.amount} {r.unit}</b>)</span>
+                        <button type="button" onClick={() => handleRemoveIngredient(r.inventoryId)} style={{ color: 'var(--color-danger)', border: 'none', background: 'none', cursor: 'pointer', fontSize: '.8rem', fontWeight: 600 }}>Remove</button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '.75rem', fontStyle: 'italic', color: 'var(--color-text-muted)' }}>No ingredients added to recipe yet.</div>
+                )}
+              </div>
+
               <div>
                 <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Description</label>
-                <textarea rows="2" value={newItem.description} onChange={e => setNewItem({ ...newItem, description: e.target.value })} placeholder="Brief description of the item..."></textarea>
+                <textarea rows="2" value={newItem.description} onChange={e => setNewItem({ ...newItem, description: e.target.value })} placeholder="Brief description..."></textarea>
               </div>
+
               <div>
                 <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Image URL (Optional)</label>
                 <input type="text" value={newItem.image} onChange={e => setNewItem({ ...newItem, image: e.target.value })} placeholder="https://..." />
               </div>
+
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={() => setIsModalOpen(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Item</button>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Item & Recipe</button>
               </div>
             </form>
           </div>
