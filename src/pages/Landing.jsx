@@ -38,7 +38,7 @@ export default function Landing() {
             Customers scan. Orders arrive. Your staff serves. No waiting. No confusion.
           </p>
           <div className="hero-cta-group">
-            <button className="btn-hero-primary" onClick={() => navigate('/check-in?table=1')}>
+            <button className="btn-hero-primary" onClick={() => navigate('/order?table=7')}>
               Try Customer Demo <ArrowRight size={18} />
             </button>
             <button className="btn-hero-outline" onClick={() => navigate('/admin')}>

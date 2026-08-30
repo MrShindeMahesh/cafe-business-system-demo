@@ -6,11 +6,17 @@ export default function Customers() {
     const { customers } = useData();
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Filter customers based on search input (name or phone)
+    // Safely filter customers (prevents crashes if name or phone is undefined)
     const filteredCustomers = customers.filter(c =>
-        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.phone.includes(searchQuery)
+        (c.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (c.phone || '').includes(searchQuery)
     );
+
+    // Helper to mask phone numbers
+    const maskPhone = (phone) => {
+        if (!phone || phone.length < 4) return 'N/A';
+        return `******${phone.slice(-4)}`;
+    };
 
     return (
         <div className="animate-fade-in">
@@ -48,12 +54,17 @@ export default function Customers() {
                                     <td>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '.875rem' }}>
                                             <div className="admin-avatar" style={{ width: '36px', height: '36px', fontSize: '.875rem' }}>
-                                                {cust.name.charAt(0).toUpperCase()}
+                                                {(cust.name || 'G').charAt(0).toUpperCase()}
                                             </div>
-                                            <div className="menu-item-name">{cust.name}</div>
+                                            <div className="menu-item-name">{cust.name || 'Guest User'}</div>
                                         </div>
                                     </td>
-                                    <td style={{ color: 'var(--color-text-secondary)' }}>{cust.phone}</td>
+
+                                    {/* MASKED PHONE NUMBER APPLIED HERE */}
+                                    <td style={{ color: 'var(--color-text-secondary)', letterSpacing: '1px' }}>
+                                        {maskPhone(cust.phone)}
+                                    </td>
+
                                     <td>
                                         <span className="badge badge-accent">{cust.orders} Orders</span>
                                     </td>
@@ -61,7 +72,7 @@ export default function Customers() {
                                         ₹{cust.totalSpent.toLocaleString()}
                                     </td>
                                     <td style={{ color: 'var(--color-text-muted)', fontSize: '.875rem' }}>
-                                        {new Date(cust.lastVisit).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                        {cust.lastVisit ? new Date(cust.lastVisit).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
                                     </td>
                                 </tr>
                             ))
