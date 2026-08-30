@@ -6,7 +6,6 @@ export default function MenuManagement() {
   const { menu, setMenu } = useData();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // State for the new item form
   const [newItem, setNewItem] = useState({
     name: '',
     category: '',
@@ -27,23 +26,25 @@ export default function MenuManagement() {
 
   const handleAddItem = (e) => {
     e.preventDefault();
+
+    // Automatically attach smart category-based modifiers so customers can customize them
+    const isBeverage = ['Coffee', 'Cold Drinks', 'Beverages'].includes(newItem.category);
+
     const itemToAdd = {
-      id: 'm' + Date.now(), // Generate a simple unique ID
+      id: 'm' + Date.now(),
       name: newItem.name,
       category: newItem.category || 'General',
       price: Number(newItem.price),
       description: newItem.description,
-      // Default placeholder image if none is provided
       image: newItem.image || 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=500&q=80',
       available: true,
-      variants: [],
-      addons: []
+      variants: isBeverage ? [{ name: 'Size', options: [{ name: 'Regular', price: 0 }, { name: 'Large', price: 40 }] }] : [],
+      addons: isBeverage
+        ? [{ name: 'Extra Shot', price: 50 }, { name: 'More Sugar / Sweet', price: 0 }]
+        : [{ name: 'Extra Cheese', price: 40 }, { name: 'Extra Sauce', price: 20 }]
     };
 
-    // Add to the top of the menu list
     setMenu([itemToAdd, ...menu]);
-
-    // Reset and close
     setNewItem({ name: '', category: '', price: '', description: '', image: '' });
     setIsModalOpen(false);
   };
@@ -110,7 +111,6 @@ export default function MenuManagement() {
         </table>
       </div>
 
-      {/* Add Item Modal */}
       {isModalOpen && (
         <div className="modal-overlay" style={{ zIndex: 999, alignItems: 'center' }}>
           <div className="card animate-scale-up" style={{ width: '100%', maxWidth: '500px', padding: '1.5rem', background: 'var(--color-surface)' }}>
@@ -124,28 +124,24 @@ export default function MenuManagement() {
                 <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Item Name</label>
                 <input required type="text" value={newItem.name} onChange={e => setNewItem({ ...newItem, name: e.target.value })} placeholder="e.g., Caramel Macchiato" />
               </div>
-
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <div style={{ flex: 1 }}>
                   <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Category</label>
-                  <input required type="text" value={newItem.category} onChange={e => setNewItem({ ...newItem, category: e.target.value })} placeholder="e.g., Coffee" />
+                  <input required type="text" value={newItem.category} onChange={e => setNewItem({ ...newItem, category: e.target.value })} placeholder="e.g., Coffee, Snacks" />
                 </div>
                 <div style={{ flex: 1 }}>
                   <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Price (₹)</label>
                   <input required type="number" min="0" value={newItem.price} onChange={e => setNewItem({ ...newItem, price: e.target.value })} placeholder="e.g., 149" />
                 </div>
               </div>
-
               <div>
                 <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Description</label>
                 <textarea rows="2" value={newItem.description} onChange={e => setNewItem({ ...newItem, description: e.target.value })} placeholder="Brief description of the item..."></textarea>
               </div>
-
               <div>
                 <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Image URL (Optional)</label>
                 <input type="text" value={newItem.image} onChange={e => setNewItem({ ...newItem, image: e.target.value })} placeholder="https://..." />
               </div>
-
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={() => setIsModalOpen(false)}>Cancel</button>
                 <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Item</button>

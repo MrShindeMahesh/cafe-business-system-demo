@@ -1132,3 +1132,13 @@ textarea {
 .space-y-4>*+* {
   margin-top: 1rem;
 }
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+body {
+  overscroll-behavior-y: none;
+  /* Prevents pull-to-refresh rubber-banding effect */
+}
