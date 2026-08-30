@@ -108,7 +108,43 @@ export const DataProvider = ({ children }) => {
       recipe: [],
       variants: [],
       addons: [{ name: 'Strawberry Compote', price: 30 }, { name: 'Blueberry Compote', price: 30 }]
-    }
+    },
+    {
+      id: '11', name: 'Hazelnut Mochaccino', price: 179, category: 'Coffee',
+      image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=500&q=80',
+      description: 'Espresso combined with rich chocolate and aromatic hazelnut syrup.', available: true,
+      recipe: [
+        { inventoryId: 'inv1', name: 'Premium Coffee Beans', unit: 'kg', amount: 0.05 },
+        { inventoryId: 'inv2', name: 'Whole Milk', unit: 'Liters', amount: 0.15 },
+        { inventoryId: 'inv5', name: 'Chocolate Syrup', unit: 'Bottles', amount: 0.05 }
+      ],
+      variants: [{ name: 'Size', options: [{ name: 'Regular', price: 0 }, { name: 'Large', price: 40 }] }],
+      addons: [{ name: 'Extra Shot', price: 50 }, { name: 'More Sugar / Sweet', price: 0 }]
+    },
+    {
+      id: '12', name: 'Classic Virgin Mojito', price: 169, category: 'Cold Drinks',
+      image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=500&q=80',
+      description: 'Refreshing blend of fresh mint, lime juice, soda, and crushed ice.', available: true,
+      recipe: [],
+      variants: [],
+      addons: [{ name: 'Extra Mint', price: 10 }, { name: 'More Sugar / Sweet', price: 0 }]
+    },
+    {
+      id: '13', name: 'Blue Lagoon Mojito', price: 179, category: 'Cold Drinks',
+      image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=500&q=80',
+      description: 'Vibrant blue curaçao syrup mixed with zesty lime, mint, and sprite.', available: true,
+      recipe: [],
+      variants: [],
+      addons: [{ name: 'Extra Sweet', price: 0 }]
+    },
+    {
+      id: '14', name: 'Peach Iced Tea', price: 159, category: 'Cold Drinks',
+      image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=500&q=80',
+      description: 'Cool brewed black tea infused with sweet peach flavor and ice.', available: true,
+      recipe: [],
+      variants: [],
+      addons: [{ name: 'Lemon Slice', price: 10 }, { name: 'More Sweet', price: 0 }]
+    },
   ]);
 
   const [customers, setCustomers] = useState([
