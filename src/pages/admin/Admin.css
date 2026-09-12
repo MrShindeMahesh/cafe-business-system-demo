@@ -39,6 +39,15 @@
   border: 1px solid rgba(232, 211, 181, 0.2);
 }
 
+.sidebar-logo-img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .sidebar-logo-text {
   font-family: var(--font-heading);
   font-size: 1.125rem;
@@ -827,4 +836,46 @@
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 0.75rem;
   }
+}
+
+/* ===== PRINT MODE: print ONLY the receipt, via the #print-portal clone ===== */
+@media print {
+  /* hide everything EXCEPT the top-level print portal (display, not visibility —
+     display:none on ancestors of the portal can't affect it since it's a direct
+     child of <body>) */
+  body > *:not(#print-portal) {
+    display: none !important;
+  }
+  #print-portal {
+    display: block !important;
+    margin: 0;
+    padding: 0;
+  }
+  #print-portal #printable-receipt {
+    position: static !important;   /* normal flow — prints across pages, never clipped */
+    width: 72mm;                   /* safe width for 80mm thermal rolls */
+    max-height: none !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #111 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 2mm 3mm !important;
+    font-size: 11px !important;
+    margin: 0 !important;
+  }
+  #print-portal #printable-receipt h4 {
+    font-size: 16px !important;
+  }
+  @page {
+    size: 80mm auto;              /* auto-height thermal roll */
+    margin: 0;
+  }
+}
+
+/* Cancelled-order badge (Today's Orders / history) */
+.badge-danger {
+  background: #fee2e2;
+  color: #b91c1c;
 }

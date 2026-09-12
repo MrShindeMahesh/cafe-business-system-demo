@@ -1,0 +1,11 @@
+'use strict';
+const fs = require('fs');
+const s = fs.readFileSync('./src/data/laCasaMenu.js', 'utf8');
+const ids = [];
+const names = [];
+s.replace(/"id":\s*"(lc_\d+)"/g, (m, id) => ids.push(id));
+s.replace(/"name":\s*"([^"]+)"/g, (m, n) => names.push(n));
+console.log('names:', names.length, 'ids:', ids.length);
+const pairs = ids.map((id, i) => [id, names[i]]).filter(p => /milk|shake/i.test(p[1]));
+console.log('milkshake:', pairs.length);
+pairs.forEach(p => console.log(p[0] + ' | ' + p[1]));

@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# runtime data — move between deployments via Settings → "Extract/Restore Data File"
+server/cafe.db
+server/cafe.db-*
+server/backups/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

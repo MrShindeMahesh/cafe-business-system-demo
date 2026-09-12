@@ -1,14 +1,23 @@
-import React from 'react';
-import { Clock, TrendingUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, TrendingUp, TrendingDown, Pencil, X } from 'lucide-react';
 import { useData } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function LiveOrders() {
-  const { orders, updateOrderStatus } = useData();
+  const { orders, tables, updateOrderStatus } = useData();
+  const { role } = useAuth();
+  const navigate = useNavigate();
+  // Revenue KPIs are visible to Admin only — Reception/Waiter see operations, not money.
+  const isAdmin = role === 'admin';
+
+  // Cancelled orders are excluded from revenue/order-day stats
+  const dayStatsActive = (o) => o.status !== 'CANCELLED';
 
   const columns = [
-    { id: 'NEW',      label: 'New',      dot: 'dot-new',       nextStatus: 'PREPARING', actionText: 'Accept Order', btnClass: 'btn-primary' },
-    { id: 'PREPARING',label: 'Preparing',dot: 'dot-preparing', nextStatus: 'READY',     actionText: 'Mark Ready',   btnClass: 'btn-warning' },
-    { id: 'READY',    label: 'Ready',    dot: 'dot-ready',     nextStatus: 'SERVED',    actionText: 'Mark Served',  btnClass: 'btn-success' },
+    { id: 'NEW', label: 'New', dot: 'dot-new', nextStatus: 'PREPARING', actionText: 'Accept Order', btnClass: 'btn-primary' },
+    { id: 'PREPARING', label: 'Preparing', dot: 'dot-preparing', nextStatus: 'READY', actionText: 'Mark Ready', btnClass: 'btn-warning' },
+    { id: 'READY', label: 'Ready', dot: 'dot-ready', nextStatus: 'SERVED', actionText: 'Mark Served', btnClass: 'btn-success' },
   ];
 
   const getTimeAgo = (dateStr) => {
@@ -16,30 +25,59 @@ export default function LiveOrders() {
     return diff < 1 ? 'Just now' : `${diff}m ago`;
   };
 
-  const revenue = orders.reduce((s, o) => s + o.total, 0);
-  const pending = orders.filter(o => o.status !== 'SERVED').length;
+  const todayKey = new Date().toLocaleDateString('en-CA');
+  const yesterdayKey = new Date(Date.now() - 86400000).toLocaleDateString('en-CA');
+
+  const statsByDay = {};
+  orders.forEach((o) => {
+    if (!o.createdAt || !dayStatsActive(o)) return;
+    const k = new Date(o.createdAt).toLocaleDateString('en-CA');
+    statsByDay[k] = statsByDay[k] || { revenue: 0, count: 0 };
+    statsByDay[k].revenue += Number(o.total) || 0;
+    statsByDay[k].count += 1;
+  });
+
+  const today = statsByDay[todayKey] || { revenue: 0, count: 0 };
+  const yesterday = statsByDay[yesterdayKey] || { revenue: 0, count: 0 };
+  const revenue = today.revenue;
+  const revPct = yesterday.revenue > 0 ? Math.round(((today.revenue - yesterday.revenue) / yesterday.revenue) * 100) : (today.revenue > 0 ? 100 : 0);
+  const ordPct = yesterday.count > 0 ? Math.round(((today.count - yesterday.count) / yesterday.count) * 100) : (today.count > 0 ? 100 : 0);
+  const pctText = (pct) => (pct > 0 ? `+${pct}%` : `${pct}%`);
+  const TrendIcon = ({ pct }) => (pct > 0 ? <TrendingUp size={10} /> : pct < 0 ? <TrendingDown size={10} /> : <span style={{ opacity: 0.35 }}><TrendingUp size={10} /></span>);
+
+  const isActive = (o) => o.status !== 'SERVED' && o.status !== 'CANCELLED';
+
+  const activeTables = new Set(
+    orders
+      .filter(isActive)
+      .map((o) => String(o.tableId || '').replace(/\D/g, ''))
+  ).size;
+  const totalTables = tables.length || 12;
+  const pending = orders.filter(isActive).length;
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* KPI Cards */}
       <div className="kpi-grid">
+        {isAdmin && (
         <div className="kpi-card">
           <div className="kpi-label">Today's Revenue</div>
           <div>
             <span className="kpi-value">₹{revenue.toLocaleString()}</span>
-            <span className="kpi-trend"><TrendingUp size={10}/> 12.4%</span>
+            <span className="kpi-trend"><TrendIcon pct={revPct} /> {pctText(revPct)}</span>
           </div>
         </div>
+        )}
         <div className="kpi-card">
           <div className="kpi-label">Today's Orders</div>
           <div>
-            <span className="kpi-value">{orders.length}</span>
-            <span className="kpi-trend"><TrendingUp size={10}/> 8.2%</span>
+            <span className="kpi-value">{today.count}</span>
+            <span className="kpi-trend"><TrendIcon pct={ordPct} /> {pctText(ordPct)}</span>
           </div>
         </div>
         <div className="kpi-card">
           <div className="kpi-label">Active Tables</div>
-          <span className="kpi-value">8<span style={{ fontSize:'1.2rem', color:'var(--color-text-muted)', fontFamily:'var(--font-body)' }}> / 12</span></span>
+          <span className="kpi-value">{activeTables}<span style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)' }}> / {totalTables}</span></span>
         </div>
         <div className="kpi-card kpi-accent-border">
           <div className="kpi-label">Pending Orders</div>
@@ -49,8 +87,8 @@ export default function LiveOrders() {
 
       {/* Kanban */}
       <div className="kanban-board">
-        {columns.map(col => {
-          const colOrders = orders.filter(o => o.status === col.id);
+        {columns.map((col) => {
+          const colOrders = orders.filter((o) => o.status === col.id);
           return (
             <div key={col.id} className="kanban-col">
               <div className="kanban-col-header">
@@ -62,15 +100,33 @@ export default function LiveOrders() {
               </div>
 
               <div className="kanban-cards">
-                {colOrders.map(order => (
+                {colOrders.map((order) => (
                   <div key={order.id} className="order-card">
-                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
-                        <div className="order-card-id">#{order.id}</div>
+                        <div className="order-card-id">#{order.id}{order.staffName ? <span style={{ fontSize: '.7rem', color: 'var(--color-text-muted)', marginLeft: '.35rem' }}>• {order.staffName}</span> : null}</div>
                         <div className="order-card-meta">
-                          <span className="order-table-pill">Table {String(order.tableId).padStart(2,'0')}</span>
-                          <span className="order-time"><Clock size={11}/>{getTimeAgo(order.createdAt)}</span>
+                          <span className="order-table-pill">{String(order.tableId).toUpperCase() === 'PARCEL' ? 'Parcel' : `Table ${String(order.tableId).padStart(2, '0')}`}</span>
+                          <span className="order-time"><Clock size={11} />{getTimeAgo(order.createdAt)}</span>
                         </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '.25rem', alignItems: 'center' }}>
+                        <button
+                          className="action-icon-btn"
+                          style={{ marginTop: '-4px' }}
+                          title="Edit this ticket (add items / change quantities)"
+                          onClick={() => navigate(`/admin/take-order?edit=${order.id}`)}
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button
+                          className="action-icon-btn"
+                          style={{ marginTop: '-4px' }}
+                          title="Cancel this order (it will leave the board)"
+                          onClick={() => { if (window.confirm(`Cancel order #${order.id} (₹${order.total})?`)) updateOrderStatus(order.id, 'CANCELLED'); }}
+                        >
+                          <X size={14} color="var(--color-danger)" />
+                        </button>
                       </div>
                     </div>
 
@@ -89,7 +145,7 @@ export default function LiveOrders() {
 
                     <button
                       className={`btn ${col.btnClass} w-full btn-sm`}
-                      style={{ width:'100%' }}
+                      style={{ width: '100%' }}
                       onClick={() => updateOrderStatus(order.id, col.nextStatus)}
                     >
                       {col.actionText}
@@ -104,6 +160,7 @@ export default function LiveOrders() {
                   </div>
                 )}
               </div>
+
             </div>
           );
         })}

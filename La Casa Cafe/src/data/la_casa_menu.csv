@@ -1,0 +1,250 @@
+Category,Item,Price (INR),Description
+Soup,Lemon Coriander,150,"Light, zesty & refreshing soup."
+Soup,Manchow Soup,150,"Spicy, flavourful Indo-Chinese soup."
+Soup,Sweet Corn Soup,160,"Mild, sweet & comforting soup."
+Soup,Tomato Soup,170,"Smooth, tangy & classic soup."
+Soup,Palak Soup,170,"Creamy, wholesome spinach soup."
+Soup,Mixed Vegetable,170,"A hearty medley of fresh vegetables in a rich, flavourful gravy."
+Salad's,Thecha,80,Fresh salad with a spicy Maharashtrian twist.
+Salad's,Green Salad,80,"Crisp, fresh & healthy garden salad."
+Salad's,Caesar Salad,150,Classic crisp salad with creamy dressing.
+Salad's,Paneer Tikka Salad,280,Fresh salad with smoky paneer tikka.
+Salad's,Russian Salad,280,"Creamy, mildly sweet vegetable salad."
+Snack Stories,Manchurian Dry/gravy,180,Crispy Manchurian tossed in a flavourful sauce.
+Snack Stories,Saya Kentucky,180,"Spicy, smoky soya-based Indo-Chinese snack."
+Snack Stories,Mushroom 65,200,"Crispy, spicy mushroom bites with South Indian flavours."
+Snack Stories,Mushroom Chilli Dry/gravy,200,Savoury mushrooms in a spicy chilli sauce.
+Snack Stories,Veg 65,200,"Crispy, spiced vegetable bites."
+Snack Stories,Veg Crispy,230,Crunchy mixed vegetables with a flavourful coating.
+Snack Stories,Veg Gold Finger,240,"Golden, crispy vegetable finger bites."
+Snack Stories,Spring Roll,240,Crispy rolls filled with flavourful vegetables.
+Snack Stories,Soyabean Chilli,240,"Spicy, savoury soyabean tossed in chilli sauce."
+Snack Stories,Paneer Chilli-Dry/gravy,250,Soft paneer in a spicy Indo-Chinese chilli sauce.
+Snack Stories,Paneer 65,250,"Crispy, spicy paneer bites."
+Snack Stories,Paneer Kentucky,250,"Spicy, smoky paneer with a bold flavour."
+Golden Crunch,Classic Nachos,200,Crispy nachos with classic Mexican flavours.
+Golden Crunch,Cheese Chilli Nachos,220,Crispy nachos with melted cheese and a spicy kick.
+Golden Crunch,Nachos Chaat,240,A fun Indian twist on classic nachos.
+Golden Crunch,Loaded Nachos,240,Nachos loaded with delicious toppings and cheese.
+Golden Crunch,Mexican Veg Tacos,240,"Spiced veggies, salsa & creamy sauce."
+Golden Crunch,Crispy Paneer Tacos,280,"Crispy paneer, fresh salsa & chipotle mayo."
+Golden Crunch,Peri-Peri Veg Tacos,300,"Spicy veggies, peri-peri sauce & crunchy lettuce."
+Golden Crunch,Avocado Tacos,350,"Creamy avocado, fresh salsa & crunchy lettuce."
+Sizzler's,Veg Sizzler,300,A sizzling platter of grilled vegetables and delicious sides.
+Sizzler's,La Casa Sizzler,390,A hearty signature sizzler with rich flavours.
+Sizzler's,Spanish Sizzler,420,A flavourful sizzling platter with Spanish-inspired flavours.
+Sizzler's,Mexican Sizzler,420,"A spicy, zesty sizzler with Mexican flavours."
+Sizzler's,Italian Sizzler,450,"A rich, cheesy sizzler with Italian flavours."
+Sushi,Vegetable Maki Sushi,350,Classic sushi rolls filled with fresh vegetables.
+Sushi,Mashroom tempura Sushi,400,"Crispy mushroom tempura, sushi rice & spicy mayo."
+Sushi,Dragon Roll Sushi,400,Fresh sushi rolls with creamy avocado.
+Casa Pizzeria,Margherita,280,Classic cheesy pizza with a rich tomato base.
+Casa Pizzeria,Mexican Pizza,300,"Spicy, cheesy pizza with Mexican flavours."
+Casa Pizzeria,Mushroom Pizza,330,Cheesy pizza topped with savoury mushrooms
+Casa Pizzeria,Green garden Pizza,350,Fresh & colourful vegetable loaded pizza.
+Casa Pizzeria,Paneer Tikka Pizza,380,Indian-style pizza with spicy paneer tikka.
+Fries,Salted fries,150,"Classic crispy fries, lightly salted."
+Fries,Peri Peri fries,160,Crispy fries with a spicy peri peri kick.
+Fries,cheesy fries,180,Crispy fries topped with creamy melted cheese.
+Fries,loaded fries,190,Crispy fries loaded with delicious toppings.
+Fries,Honey chilli fries,200,Crispy fries tossed in a sweet & spicy honey-chilli glaze.
+Between The Breads,Garlic Bread,160,Crispy toasted bread with rich garlic flavour.
+Between The Breads,Cheese Chilli Toast,180,Cheesy toast with a spicy chilli kick.
+Between The Breads,Veggie Sandwich,180,Fresh and wholesome vegetable-filled sandwich.
+Between The Breads,Bombay Potato Sandwich,180,Classic Mumbai-style spiced potato sandwich.
+Between The Breads,Aloo Tikki Burger,200,Crispy potato tikki served in a soft burger.
+Between The Breads,Cheese Corn Capsicum S'wich,200,"Creamy, cheesy sandwich with sweet corn and crunchy capsicum."
+Between The Breads,Bruschetta,200,Crisp toasted bread with a fresh Italian topping.
+Between The Breads,Avocado Toast,230,"Creamy avocado spread on crisp, toasted bread."
+Between The Breads,Grilled Onion & Mushroom S'wich,230,Grilled sandwich with savoury mushrooms and caramelised onion.
+Between The Breads,Paneer Tikka Sandwich,250,Grilled sandwich packed with smoky paneer tikka.
+Between The Breads,Peppy Paneer Sandwich,250,"Cheesy, spicy paneer sandwich with a bold flavour."
+Between The Breads,Paneer Tikka Burger,280,Smoky paneer tikka served in a delicious burger.
+Noodle's Affair,Hakka Noodles,180,Classic stir-fried noodles with Indo-Chinese flavours.
+Noodle's Affair,Schezwan Noodles,190,Spicy stir-fried noodles with bold Schezwan flavour.
+Noodle's Affair,Soya Noodles,200,Crispy soya made with green veggies and mild spices.
+Noodle's Affair,Manchurian Noodles,200,Noodles tossed with flavourful Manchurian balls.
+Noodle's Affair,Chiense Bhel,200,"Crispy noodles tossed in a spicy, tangy Indo-Chinese style."
+Noodle's Affair,Mashroom Noodles,230,Stir-fried noodles with savoury mushrooms.
+Noodle's Affair,Paneer Noodles,250,Stir-fried noodles with flavourful paneer.
+Noodle's Affair,Triple Schezwan Noodles,250,"A spicy, hearty noodle dish with a triple Schezwan twist."
+Papad,Fry papad,40,
+Papad,Roasted papad,40,
+Papad,Masala papad,60,
+Papad,Nagli papad,70,
+Pasta di Casa,Aglio olio,230,"Simple, aromatic pasta with a light garlic flavour."
+Pasta di Casa,Marinara Pasta,240,"Classic pasta tossed in a rich, tangy tomato sauce."
+Pasta di Casa,Alfreda Pasta,260,"Creamy, rich pasta with a smooth white sauce."
+Pasta di Casa,Mac & cheese,260,"Comforting pasta coated in creamy, cheesy sauce."
+Chinese Rice,Veg Fried Rice,180,Classic wok-tossed rice with fresh vegetables.
+Chinese Rice,Schezwan Fried Rice,190,Spicy fried rice with bold Schezwan flavours.
+Chinese Rice,Soya Fried Rice,200,Savoury fried rice with a rich soya flavour.
+Chinese Rice,Manchurian Fried Rice,200,Fried rice with a delicious Indo-Chinese twist.
+Chinese Rice,Burnt garlic Rice,200,Aromatic fried rice with a smoky garlic flavour.
+Chinese Rice,Mashroom Fried Rice,230,Wok-tossed rice with savoury mushrooms.
+Chinese Rice,Paneer Fried Rice,250,Flavourful fried rice with soft paneer.
+Chinese Rice,Triple Schezwan Fried Rice,250,Extra-spicy fried rice with bold Schezwan flavours.
+Indian Rice,Steam Rice Half,110,
+Indian Rice,Steam Rice Full,180,
+Indian Rice,Jeera Rice Half,120,
+Indian Rice,Jeera Rice Full,190,
+Indian Rice,Spl. Jeera Rice,220,
+Indian Rice,Masala Rice,210,
+Indian Rice,Dal Khichdi,240,
+Indian Rice,Moong Dal Khichdi,250,
+Indian Rice,Veg Pulao,260,
+Indian Rice,Veg Biryani,290,
+Rice Bowl,Veg Burito Bowl,200,"Rice, Beans, Salsa, Veggies, Cheese"
+Rice Bowl,Rajma Bowl,230,"Rice, Rajma, Onion, Tomato, Herbs"
+Rice Bowl,Soya Keema Bowl,230,"Rice, Soya Keema, Veggies, Spices"
+Rice Bowl,Dal Makhani Bowl,280,"Rice, Dal Makhni, Cream, Herbs"
+Rice Bowl,Paneer Burito Bowl,280,"Rice, Paneer, Beans, Salsa, Veggies"
+Paneer Main Course,Paneer Kadai,250,
+Paneer Main Course,Paneer Saoji,250,
+Paneer Main Course,Paneer Masala,250,
+Paneer Main Course,Palak Paneer,250,
+Paneer Main Course,Paneer Butter Masala,260,
+Paneer Main Course,Paneer tikka Masala,260,
+Paneer Main Course,Matar Paneer,260,
+Paneer Main Course,Paneer Hyderabadi,260,
+Paneer Main Course,Paneer Mumtaz,260,
+Paneer Main Course,Korma Paneer,260,
+Paneer Main Course,Paneer bhurji,260,
+Paneer Main Course,Kaju Paneer masala,260,
+Paneer Main Course,Tawa Paneer,260,
+Paneer Main Course,Paneer Angara,280,
+Paneer Main Course,Paneer Makhanwala,280,
+Paneer Main Course,Paneer Shahi Karma,280,
+Paneer Main Course,Paneer lahori,280,
+Paneer Main Course,Paneer kali Mirch,280,
+Paneer Main Course,Paneer Lababdar,300,
+Paneer Main Course,Paneer Pasanda,300,
+Paneer Main Course,Paneer Patiala,300,
+Paneer Main Course,Paneer Maharaja,300,
+Veg Main Course,Shev Bhaji,180,
+Veg Main Course,Chana Masala,180,
+Veg Main Course,Bhindi Fry,180,
+Veg Main Course,Bhindi Masala,180,
+Veg Main Course,Tawa Besan,180,
+Veg Main Course,Baingan Masala,180,
+Veg Main Course,Soyabean Masala,180,
+Veg Main Course,Veg Bhuna,190,
+Veg Main Course,Jeera Aloo,200,
+Veg Main Course,Veg Kofta,200,
+Veg Main Course,Aloo Matar,200,
+Veg Main Course,Mix Veg,230,
+Veg Main Course,Shevga Fry,230,
+Veg Main Course,Aloo Kali Mirch,230,
+Veg Main Course,Methi Masala,230,
+Veg Main Course,Patwadi Masala,240,
+Veg Main Course,Veg Kolhapuri,240,
+Veg Main Course,Kaju Karara,300,
+Veg Main Course,Lasooni Methi,240,
+Veg Main Course,Methi Matar Masala,250,
+Veg Main Course,Kaju Masala,250,
+Veg Main Course,Mix Veg Hyderabadi,250,
+Veg Main Course,Kaju Malai,250,
+Veg Main Course,Tawa Veg Bhaji,300,
+Veg Main Course,Malai Kofta,300,
+Veg Main Course,Mashroom Masala,280,
+Veg Main Course,Mashroom kadhai,300,
+Veg Main Course,Baingan Tawa Bharta,300,
+Veg Main Course,Hariyali Kebab Masala,300,
+Veg Main Course,Veg Tiranga,300,
+Dal Classic's,Dal tadka,230,
+Dal Classic's,Dal fry,190,
+Dal Classic's,Butter Dal Fry,210,
+Dal Classic's,Dal Makhani,300,
+Roti,Chapati,20,
+Roti,Tandoori Roti,25,
+Roti,Wheat Roti,25,
+Roti,Butter Wheat Roti,35,
+Roti,Butter Roti,35,
+Roti,Bajri Bhakri,40,
+Roti,Jowar Bhakri,40,
+Roti,Lacha Paratha,65,
+Roti,Plain Nan,55,
+Roti,Butter Nan,65,
+Roti,Missi Roti,75,
+Roti,Butter Missi Roti,85,
+Roti,Garlic Nan,80,
+Roti,Butter Garlic Nan,90,
+Roti,Ghee Roti,45,
+Kebab Corner,Soya Achari tikka,200,Smoky soya tikka with tangy achari flavours.
+Kebab Corner,Afghani Soya Chaap,230,"Creamy, mildly spiced and rich soya chaap."
+Kebab Corner,Banjara Soya Chaap,230,"Smoky, spicy soya chaap with bold flavours."
+Kebab Corner,Veg Seekh Kabab,230,Grilled vegetable kebabs with aromatic spices.
+Kebab Corner,Hara Bhara Kabab,230,"Crispy, wholesome green vegetable kebabs."
+Kebab Corner,Mashroom tikka,260,"Grilled mushrooms with a smoky, spiced coating."
+Kebab Corner,Paneer Achari tikka,280,Grilled paneer with tangy achari flavours.
+Kebab Corner,Banjara Paneer tikka,280,Smoky paneer tikka with bold spices.
+Kebab Corner,Paneer Afgani tikka,280,"Creamy, rich and mildly spiced paneer tikka."
+Kebab Corner,Paneer Tikka,280,Classic smoky grilled paneer with Indian spices.
+Kebab Corner,Hara Bhara Paneer Tikka,300,Grilled paneer with fresh green flavours.
+Kebab Corner,Paneer Guljari,300,Grilled paneer with fresh green flavours.
+
+
+Hot Drinks,Cappuccino,180,"Espresso, steamed milk and silky foam."
+Hot Drinks,Café Latte,180,Smooth espresso with creamy milk.
+Hot Drinks,Americano,140,"Bold espresso, clean and refreshing."
+Hot Drinks,Espresso Shot,120,"Rich, intense and aromatic."
+Hot Drinks,Mocha,200,"Espresso, chocolate and creamy milk."
+Hot Drinks,Hot Chocolate,240,"Rich, smooth and indulgent chocolate."
+Hot Drinks,Spanish Latte,220,"Espresso, milk and condensed sweetness."
+Hot Drinks,Caramel Latte,220,"Espresso, creamy milk and caramel."
+Hot Drinks,Green Tea,80,"Light, fresh and soothing."
+Hot Drinks,Cardamom Black Tea,80,Bold tea with fragrant cardamom.
+Cold Coffees,Iced Americano,140,Bold espresso served chilled.
+Cold Coffees,Iced Latte,200,"Espresso, chilled milk and ice."
+Cold Coffees,Iced Mocha,220,Chilled coffee with rich chocolate.
+Cold Coffees,Caramel Frappe,220,Blended coffee with sweet caramel.
+Cold Coffees,Iced Spanish Latte,240,"Chilled espresso, creamy condensed milk."
+Cold Coffees,Iced Oreo Frappe,220,Creamy coffee with Oreo crunch.
+Cold Coffees,Choco Chip Frappe,220,"Chocolate chips, coffee and creamy ice."
+Cold Coffees,Brown Butter Latte,240,Coffee with rich nutty notes.
+Cold Coffees,Classic Cold Coffee,160,"Smooth, creamy and chilled."
+Cold Coffees,Mango Coconut Matcha,300,"Matcha, mango and creamy coconut."
+Cookies,Choco Chip Cookies,150,Buttery cookies loaded with chocolate chips.
+Cookies,Honey Oat Cookies,150,Wholesome oat cookies with a touch of honey.
+Ice Cream,Vanilla,100,"Classic, creamy and smooth."
+Ice Cream,Chocolate,100,"Rich, indulgent chocolate flavour."
+Ice Cream,Strawberry,100,"Sweet, fruity and refreshing."
+Ice Cream,Butterscotch,100,Creamy with crunchy caramel bits.
+Ice Cream,Mango,100,"Smooth, fruity and tropical."
+Ice Cream,Cookies & Cream,200,Creamy vanilla with cookie crunch.
+Ice Cream,Affogato,200,Vanilla ice cream topped with rich espresso.
+Ice Cream,Extra Scoop,60,
+Coffee Add-ons,Extra Espresso Shot,60,
+Coffee Add-ons,Vanilla,30,
+Coffee Add-ons,Caramel,30,
+Coffee Add-ons,Hazelnut,30,
+Coffee Add-ons,Chocolate,40,
+Coffee Add-ons,Ice Cream,60,
+Mocktails,Coconut Orange Cloud,200,"Creamy coconut, bright orange, citrusy finish."
+Mocktails,Watermelon Mimosa,230,"Fresh watermelon, fizzy and refreshing."
+Mocktails,Pineapple Lime Mojito,240,"Pineapple, lime and fresh mint."
+Mocktails,Lychee Fantasy,240,"Sweet lychee, light floral finish."
+Mocktails,Green Screwdriver,200,Zesty citrus with a vibrant twist.
+Mocktails,Strawberry Diablo,220,"Strawberry, lime and sweet-tart notes."
+Mocktails,Mango Passion Cooler,200,"Mango, passion fruit and tropical freshness."
+Mocktails,Saffron foam iced Tea,200,"Saffron, green tea and aromatic seeds."
+Mocktails,Peach iced Tea,180,Peachy sweetness with refreshing tea notes.
+Mocktails,Virgin mojito,200,Peachy sweetness with refreshing tea notes.
+Indian Classics,Jigarthanda,240,"Milk, nannari and silky sweetness."
+Indian Classics,Panakam,120,"Jaggery, ginger and cardamom cooler."
+Indian Classics,Variyali Sharbat,180,"Sweet, cooling fennel refresher."
+Indian Classics,Sannata Taak,140,Cooling buttermilk with aromatic spices.
+Indian Classics,Aam Pora Sharbat,180,"Smoky mango, jaggery and spices."
+Dessert,Cheesecake,200,"Creamy, rich and delicately sweet."
+Dessert,Chocolate Cheesecake,240,Creamy cheesecake with rich chocolate indulgence.
+Dessert,Caramel Cheesecake,240,Creamy cheesecake with a rich caramel finish.
+Dessert,Lotus Biscoff Cheesecake,240,Creamy cheesecake with a rich Biscoff biscuit finish.
+Dessert,Pull Me Up Cake,300,Soft cake with creamy topping.
+Dessert,Sizzling Brownie,180,Warm brownie with a sizzling finish.
+Dessert,Gulab Jamun,80,"Soft, warm and syrupy."
+Dessert,Rasmalai,140,"Saffron milk, soft cheese dumplings."
+Dessert,Rasgulla,100,"Soft, spongy and syrup-soaked."
+Dessert,French Toast with Ice Cream,180,Golden toast with creamy ice cream.
+Dessert,Chocolate Truffle Cake,220,Rich chocolate with silky truffle cream.
+Dessert,Caramel Pudding,160,"Silky caramel pudding with a rich, buttery finish."
+Dessert,Tiramisu,240,Coffee-soaked sponge layered with mascarpone and cocoa.
