@@ -7,6 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
+import os from 'node:os';
 import { db } from './db.js';
 import { printKitchenTicket, printSample, printReceipt } from './print.js';
 
@@ -972,7 +973,20 @@ if (fs.existsSync(DIST)) {
   });
 }
 
+// LAN address for phone access (waiter phones on the same Wi-Fi)
+const lanUrl = () => {
+  for (const list of Object.values(os.networkInterfaces())) {
+    for (const n of list) {
+      if (n.family === 'IPv4' && !n.internal) return `http://${n.address}:${PORT}`;
+    }
+  }
+  return null;
+};
+app.get('/api/network', (req, res) => res.json({ url: lanUrl(), port: PORT }));
+
 app.listen(PORT, () => {
   console.log(`✔ Café API running → http://localhost:${PORT}`);
+  const lan = lanUrl();
+  if (lan) console.log(`✔ Phone access (same Wi-Fi) → ${lan}`);
   console.log(`✔ Frontend ${fs.existsSync(DIST) ? 'served from dist' : 'run "npm run dev" for the dev dashboard'}`);
 });

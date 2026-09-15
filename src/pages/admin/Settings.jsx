@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { ROLES } from '../../lib/roles';
 import { downloadCsv, downloadJson, ordersCsvColumns, menuCsvColumns, inventoryCsvColumns, customersCsvColumns } from '../../lib/exportData';
 import { clearLocalDb, backupAll, restoreAll } from '../../lib/localDb';
+import qrcode from '../../lib/qrcode.min.js';
 
 export default function Settings() {
   const { settings, updateSettings, orders, menu, inventory, customers } = useData();
@@ -12,6 +13,21 @@ export default function Settings() {
   const [pinDrafts, setPinDrafts] = useState({});
   const dateStamp = new Date().toISOString().slice(0, 10);
   const [localSettings, setLocalSettings] = useState(settings);
+
+  // ── Waiter phone access: LAN URL + QR ──
+  const [lanInfo, setLanInfo] = useState(null);
+  useEffect(() => {
+    fetch('/api/network').then(r => r.json()).then(d => setLanInfo(d)).catch(() => {});
+  }, []);
+  const waiterQr = (() => {
+    try {
+      if (!lanInfo?.url) return null;
+      const qr = qrcode(0, 'M');
+      qr.addData(lanInfo.url);
+      qr.make();
+      return qr.createDataURL(6, 12);
+    } catch { return null; }
+  })();
 
   const handleClearData = () => {
     if (window.confirm("WARNING: This will permanently delete ALL local data (orders, menu, inventory, customers) and reset to defaults. Are you sure?")) {
@@ -616,6 +632,38 @@ export default function Settings() {
             <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginTop: '.75rem' }}>
               Best: PNG with a transparent/white background, square, max 2MB. Use the QR your bank/UPI app gives you.
             </p>
+          </div>
+
+          {/* ─── Waiter phone access (LAN QR) ─── */}
+          <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
+            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.4rem' }}>
+              <QrCode size={18} /> Waiter Phone Access
+            </h3>
+            {lanInfo?.url ? (
+              <>
+                <p style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)', marginBottom: '1rem', lineHeight: 1.6 }}>
+                  Waiters can open the POS on their phone (connected to the <b>same Wi-Fi</b> as this computer)
+                  by scanning this QR or typing the address in the phone browser. On the phone, choose the
+                  <b> Waiter </b> role and enter the waiter PIN.
+                </p>
+                {waiterQr && (
+                  <img
+                    src={waiterQr}
+                    alt="POS address QR"
+                    style={{ width: '190px', height: '190px', background: '#fff', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', padding: '10px' }}
+                  />
+                )}
+                <p style={{ fontWeight: 700, fontSize: '1.05rem', margin: '.9rem 0 .5rem', letterSpacing: '.02em' }}>{lanInfo.url}</p>
+                <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
+                  If the phone cannot connect: run <b>Allow Phone Access.bat</b> once (right-click → <b>Run as administrator</b>) —
+                  Windows blocks the port by default. The address may change if the router restarts; refresh this page to get the new QR.
+                </p>
+              </>
+            ) : (
+              <p style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)' }}>
+                Could not detect the network address. Make sure the server is running, then reload this page.
+              </p>
+            )}
           </div>
 
 
