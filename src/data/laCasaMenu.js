@@ -1948,7 +1948,7 @@ export const laCasaMenu = [
     "id": "lc_133",
     "name": "Aloo Matar",
     "category": "Veg Main Course",
-    "price": 200,
+    "price": 240,
     "description": "",
     "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=500&q=80",
     "available": true,

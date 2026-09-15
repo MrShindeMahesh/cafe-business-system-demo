@@ -34,16 +34,21 @@ export default function TakeOrder() {
   const [itemPicker, setItemPicker] = useState(null); // { item, qty, variants: {}, addons: {} }
   const [pickerQty, setPickerQty] = useState(1);
 
+  const searchActive = !!searchQuery.trim();
   const categories = [...new Set(menu.map((m) => m.category))];
-  const visibleCategories = categoryFilter === 'All' ? categories : categories.filter((c) => c === categoryFilter);
   const availableMenu = menu.filter((m) => {
     if (m.available === false) return false;
-    if (searchQuery.trim()) {
+    if (searchActive) {
       const q = searchQuery.toLowerCase();
       return m.name.toLowerCase().includes(q) || m.category.toLowerCase().includes(q);
     }
     return true;
   });
+  // While searching: show ONLY categories that actually have matching items — no blank headers.
+  // With a category selected: show only that category.
+  const visibleCategories = searchActive
+    ? categories.filter((c) => availableMenu.some((m) => m.category === c) && (categoryFilter === 'All' || c === categoryFilter))
+    : (categoryFilter === 'All' ? categories : categories.filter((c) => c === categoryFilter));
 
   const addItem = (item) => {
     setCart((prev) => {
@@ -342,7 +347,8 @@ export default function TakeOrder() {
         )}
       </div>
 
-      {/* Category filter pills */}
+      {/* Category filter pills — hidden while searching (only matching items show) */}
+      {!searchActive && (
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
         <button
           onClick={() => setCategoryFilter('All')}
@@ -366,6 +372,7 @@ export default function TakeOrder() {
           );
         })}
       </div>
+      )}
 
       {/* Search bar */}
       <div className="card" style={{ padding: '0.75rem 1rem', marginBottom: '1rem' }}>

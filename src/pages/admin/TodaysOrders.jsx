@@ -176,26 +176,81 @@ export default function TodaysOrders() {
     };
 
     const printSingleBill = (ord) => {
-        const items = (ord.items || [])
-            .map(i => (i.quantity > 1 ? `${i.quantity}× ` : '') + i.name)
-            .join(', ') || '—';
+        // Reprint the SAME receipt format as the bill print (BillModal):
+        // logo, cafe name, contact, GST/GSTIN, bill no, item tags/mods, full totals breakdown.
+        const s = settings || {};
+        const payment = (payments || []).find(p => (p.orderIds || []).includes(ord.id)); // settlement → discount + payment mode
+        const subtotal = Number(ord.subtotal) || (ord.items || []).reduce((sum, i) => sum + (Number(i.calculatedPrice) || 0), 0);
+        const gstEnabled = s.gstEnabled === true;
+        const gstRate = Number(s.gstRate) || 0;
+        const gstIn = s.gstIn || '';
+        const scEnabled = s.serviceChargeEnabled === true;
+        const scPct = Number(s.serviceChargePercent) || 0;
+        const gstAmount = gstEnabled ? Math.round(subtotal * (gstRate / 100) * 100) / 100 : 0;
+        const afterGst = subtotal + gstAmount;
+        const scAmount = scEnabled ? Math.round(afterGst * (scPct / 100) * 100) / 100 : 0;
+        const grandTotal = afterGst + scAmount;
+        const discount = Math.min(Math.max(Number(payment?.discount) || 0, 0), grandTotal);
+        const finalTotal = Math.round((grandTotal - discount) * 100) / 100;
+        const billNoLabel = (ord.billNo != null && ord.billNo !== '') ? `${s.billPrefix ?? ''}${String(ord.billNo).padStart(Number(s.billPadding) || 0, '0')}` : '—';
+        const isParcel = String(ord.tableId).toUpperCase() === 'PARCEL';
+        const billDate = payment?.settledAt || ord.createdAt || '';
+        // UPI QR — same source as BillModal
+        let selectedQr = null;
+        try {
+            const parsed = JSON.parse(s.upiQrs || '[]');
+            if (Array.isArray(parsed) && parsed.length) selectedQr = parsed[0];
+        } catch { /* legacy single-QR below */ }
+        if (!selectedQr && s.upiQr) selectedQr = { label: 'UPI', path: s.upiQr };
+
+        const itemRows = (ord.items || []).map((item) => {
+            const variants = item.customizations?.variants ? Object.keys(item.customizations.variants).filter(k => item.customizations.variants[k].name).map(k => item.customizations.variants[k].name) : [];
+            const addons = item.customizations?.addons ? Object.keys(item.customizations.addons).filter(k => item.customizations.addons[k].name).map(k => item.customizations.addons[k].name) : [];
+            const mods = [...variants, ...addons];
+            const veg = item.veg === false ? 'N' : item.veg === true ? 'V' : '';
+            const spice = item.spiceLevel || '';
+            const cost = Number(item.costPrice);
+            let tag = '';
+            if (veg) tag += `[${veg}] `;
+            if (spice) tag += `${spice} `;
+            if (cost) tag += `cost ${cost.toFixed(2)}`;
+            const linePrice = item.calculatedPrice ?? (Number(item.unitPrice) || 0) * (item.quantity || 1);
+            return '<div style="display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:.2rem">' +
+                '<div style="flex:1;min-width:0">' +
+                    '<div>' + item.quantity + ' × ' + item.name + '</div>' +
+                    (mods.length ? '<div style="font-size:.75rem;color:#666;margin-top:.15rem">' + mods.join(', ') + '</div>' : '') +
+                    (tag.trim() ? '<div style="font-size:.7rem;color:#888;margin-top:.1rem">' + tag.trim() + '</div>' : '') +
+                '</div>' +
+                '<span style="font-weight:600;flex-shrink:0">₹' + linePrice + '</span>' +
+            '</div>';
+        }).join('');
+
         const rep = document.createElement('div');
         rep.id = 'printable-receipt';
         rep.innerHTML =
-            '<div style="text-align:center;margin-bottom:.4rem">' +
-                '<h4 style="font-size:1rem;font-weight:700;margin:2px 0">' + (settings?.cafeName || 'La Casa') + '</h4>' +
-                '<div style="font-size:.75rem;color:#555">Order #' + ord.id + (ord.billNo ? '  ·  Bill No: ' + ord.billNo : '') + '</div>' +
+            '<div style="background:#fff;color:#111;padding:1rem">' +
+            '<div style="text-align:center;margin-bottom:1rem">' +
+                (s.cafeLogo ? '<img src="' + s.cafeLogo + '" alt="logo" style="width:56px;height:56px;object-fit:contain;margin:0 auto 4px;display:block" />' : '') +
+                '<h4 style="font-size:1.2rem;font-weight:700;margin:4px 0">' + (s.cafeName || 'La Casa') + '</h4>' +
+                '<p style="font-size:.75rem;color:#666">' + (isParcel ? 'Parcel (Takeaway)' : 'Table #' + String(ord.tableId)) + ' • 1 Ticket(s)</p>' +
+                '<p style="font-size:.75rem;color:#666">' + new Date(billDate).toLocaleString() + '</p>' +
+                (s.contact ? '<p style="font-size:.75rem;color:#666;margin-top:.15rem">Ph: ' + s.contact + '</p>' : '') +
+                (gstEnabled ? '<p style="font-size:.7rem;color:#888;margin-top:.25rem">GST @' + gstRate + '%' + (gstIn ? ' - GSTIN: ' + gstIn : '') + '</p>' : '') +
+                '<p style="font-size:.75rem;color:#888;margin-top:.25rem;font-weight:700">Bill No: ' + billNoLabel + '</p>' +
             '</div>' +
-            '<div style="border-top:1px solid #999;margin-bottom:.3rem;padding:0 .3rem;font-size:.8rem">' +
-                (String(ord.tableId).toUpperCase() === 'PARCEL' ? 'Parcel (Takeaway)' : 'Table ' + String(ord.tableId).padStart(2, '0')) +
-                '  ·  ' + when(ord.createdAt) +
+            '<div style="margin-bottom:1rem;border-bottom:1px dashed #ddd;padding-bottom:.5rem">' +
+                '<div style="font-size:.75rem;font-weight:700;color:#888;margin-bottom:.25rem">Ticket #' + ord.id + '</div>' +
+                itemRows +
             '</div>' +
-            '<div style="font-size:.8rem;margin-bottom:.3rem">' + items + '</div>' +
-            '<div style="border-top:1px solid #999;margin-top:.3rem;display:flex;justify-content:space-between;font-weight:700">' +
-                '<span>Total</span><span>₹' + (ord.total || 0) + '</span>' +
+            '<div style="border-top:1px dashed #ddd;padding-top:.75rem;margin-top:.75rem">' +
+                '<div style="display:flex;justify-content:space-between;font-size:.8125rem;color:#555;margin-bottom:.5rem"><span>Subtotal</span><span>₹' + subtotal + '</span></div>' +
+                (gstEnabled && gstAmount > 0 ? '<div style="display:flex;justify-content:space-between;font-size:.8125rem;color:#555;margin-bottom:.5rem"><span>GST @' + gstRate + '%' + (gstIn ? ' (' + gstIn + ')' : '') + '</span><span>₹' + gstAmount + '</span></div>' : '') +
+                (scEnabled && scAmount > 0 ? '<div style="display:flex;justify-content:space-between;font-size:.8125rem;color:#555;margin-bottom:.5rem"><span>Svc.Charge @' + scPct + '%</span><span>₹' + scAmount + '</span></div>' : '') +
+                (discount > 0 ? '<div style="display:flex;justify-content:space-between;font-size:.8125rem;color:#b91c1c;margin-bottom:.5rem"><span>Discount</span><span>− ₹' + discount + '</span></div>' : '') +
+                '<div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:700;border-top:1px solid #111;padding-top:.5rem;color:#111"><span>Grand Total</span><span>₹' + finalTotal + '</span></div>' +
+                (payment ? '<div style="display:flex;justify-content:space-between;font-size:.75rem;color:#666;margin-top:.5rem"><span>Paid via ' + (payment.paymentMode || 'Cash') + '</span><span></span></div>' : '') +
             '</div>' +
-            '<div style="font-size:.75rem;color:#555;margin-top:.2rem">' +
-                (ord.customerName || 'Guest') + '  ·  ' + (ord.status || '') +
+            ((payment?.paymentMode === 'UPI' && selectedQr) ? '<div style="text-align:center;margin-top:.75rem;padding-top:.75rem;border-top:1px dashed #ddd"><p style="font-size:.8rem;font-weight:700;color:#111;margin-bottom:.5rem">Scan to pay' + (selectedQr.label ? ' • ' + selectedQr.label : '') + '</p><img src="' + selectedQr.path + '" alt="UPI QR" style="width:140px;height:140px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ddd;display:block;margin:0 auto" /></div>' : '') +
             '</div>';
         printPortal(rep);
     };
