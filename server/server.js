@@ -46,6 +46,50 @@ const rowOrder = (r) => ({
   customerName: r.customer_name, customerPhone: r.customer_phone,
   status: r.status, createdAt: r.created_at,
   staffName: r.staff_name || '',
+  billNo: r.bill_no ?? null,
+});
+
+// ---- bill numbers -------------------------------------------------------
+// One number per BILL (a consolidated bill may cover several tickets).
+// Sequence resets every day: the first bill of the day is 1, next is 2, ...
+// Assigned ONCE when the bill is first printed/settled and stored on the
+// orders — so reprinting the same bill always shows the same number.
+const billNoForToday = () => {
+  const today = new Date();
+  const ds = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+  let max = 0;
+  for (const r of db.prepare('SELECT bill_no, created_at FROM orders WHERE bill_no IS NOT NULL').all()) {
+    const d = new Date(r.created_at);
+    const s = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    if (s === ds && Number(r.bill_no) > max) max = Number(r.bill_no);
+  }
+  return max + 1;
+};
+
+// Assign a bill number to a set of order ids (one consolidated bill).
+// If any of the orders already carries a bill number, it is reused as-is.
+const assignBillNumbers = (orderIds) => {
+  const ids = [...new Set((orderIds || []).map(String).filter(Boolean))];
+  if (!ids.length) return null;
+  const get = db.prepare('SELECT id, bill_no FROM orders WHERE id = ?');
+  for (const id of ids) {
+    const r = get.get(id);
+    if (r && r.bill_no) return r.bill_no; // reprint — keep the same number
+  }
+  const billNo = billNoForToday();
+  const upd = db.prepare('UPDATE orders SET bill_no = ? WHERE id = ? AND bill_no IS NULL');
+  withTransaction(() => { for (const id of ids) upd.run(billNo, id); });
+  return billNo;
+};
+
+app.post('/api/bills/assign', (req, res) => {
+  try {
+    const billNo = assignBillNumbers((req.body || {}).orderIds);
+    if (!billNo) return res.status(400).json({ error: 'orderIds required' });
+    res.json({ ok: true, billNo });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 const rowMenu = (r) => ({
   id: r.id, name: r.name, category: r.category, price: r.price, description: r.description,
@@ -464,8 +508,11 @@ app.post('/api/print-test', async (req, res) => {
 app.post('/api/print-receipt', async (req, res) => {
   try {
     const { table, orders } = req.body;
-    const result = await printReceipt({ table, orders, settings: getSettings() });
-    res.json(result || { ok: true });
+    // Assign (or reuse) the bill number BEFORE printing so every reprint of
+    // the same bill shows the same number.
+    const billNo = assignBillNumbers((orders || []).map(o => o.id));
+    const result = await printReceipt({ table, orders, settings: getSettings(), billNo });
+    res.json(result || { ok: true, billNo });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

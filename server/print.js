@@ -163,13 +163,20 @@ const row = (l, r) => {
   return (l.length > avail ? l.slice(0, avail) : l.padEnd(avail)) + r;
 };
 
-export async function printReceipt({ table, orders: tableOrders, settings: customSettings }) {
+export async function printReceipt({ table, orders: tableOrders, settings: customSettings, billNo: preassigned }) {
   const settingsIn = customSettings || getSettings();
   const settings = settingsIn;
 
-  // ---- increment bill counter and synthesize bill number ----
-  const nextCounter = (settings.billCounter || 0) + 1;
-  const billNo = (settings.billPrefix || 'LB') + String(nextCounter).padStart(Number(settings.billPadding) || 4, '0');
+  // ---- bill number: stable per bill — assigned once via /api/bills/assign ----
+  // Reprints pass the stored number (or the orders already carry it), so the
+  // same bill always prints with the same number. Fallback for direct calls:
+  // derive from the orders' stored bill_no, else the settings counter.
+  let billNo = preassigned ?? tableOrders.map(o => o.billNo).find(Boolean);
+  if (!billNo) {
+    const nextCounter = (settings.billCounter || 0) + 1;
+    billNo = (settings.billPrefix || '') + String(nextCounter).padStart(Number(settings.billPadding) || 0, '0');
+  }
+  const billNoLabel = (settings.billPrefix || '') + String(billNo).padStart(Number(settings.billPadding) || 0, '0');
 
   const ip = settings.printerIp;
   const cafe = settings.cafeName || 'La Casa';
@@ -201,7 +208,7 @@ export async function printReceipt({ table, orders: tableOrders, settings: custo
   out += alignCenter + boldOn + '*** CASH BILL ***' + boldOff + '\n';
   out += alignLeft + `Table: ${tNum}   GSTIN: ${gstIn}\n`;
   out += `Date: ${now}\n`;
-  out += `Bill No: ${billNo}\n`;
+  out += `Bill No: ${billNoLabel}\n`;
   out += `Tickets: ${tableOrders.length}\n`;
   out += line + '\n';
 

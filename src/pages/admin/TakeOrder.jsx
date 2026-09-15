@@ -277,18 +277,9 @@ export default function TakeOrder() {
     }
   };
 
-  if (isEdit && editOrder && editOrder.status === 'SERVED') {
-    return (
-      <div className="animate-fade-in" style={{ maxWidth: '460px', margin: '3rem auto', textAlign: 'center' }}>
-        <div className="card" style={{ padding: '3rem 2rem' }}>
-          <CheckCircle2 size={56} color="var(--color-text-muted)" style={{ margin: '0 auto 1.25rem' }} />
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', marginBottom: '.5rem' }}>Order #{editId} is already settled</h2>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '.9rem', marginBottom: '1.5rem' }}>Settled orders cannot be edited.</p>
-          <button className="btn btn-primary" onClick={() => navigate('/admin/tables')}>Back to Tables</button>
-        </div>
-      </div>
-    );
-  }
+  // NOTE: editing settled (SERVED) orders is allowed — the Edit button in
+  // Today's Orders intentionally targets settled tickets (fix a wrong item,
+  // add a missed one before the day-close report).
 
   if (placed) {
     return (

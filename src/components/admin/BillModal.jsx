@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -111,6 +111,31 @@ export default function BillModal({ table, onClose }) {
     const discountNum = Math.min(Math.max(Number(discountInput) || 0, 0), grandTotal);
 
     const finalTotal = Math.round((grandTotal - discountNum) * 100) / 100;
+
+    // ---- bill number: assigned once per bill (daily sequence 1, 2, 3…) ----
+    // Stored on the orders server-side, so reprinting always shows the same number.
+
+    const [billNo, setBillNo] = useState(null);
+
+    useEffect(() => {
+
+        const ids = tableOrders.map(o => o.id).filter(Boolean);
+
+        if (!ids.length) return;
+
+        let alive = true;
+
+        fetch('/api/bills/assign', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderIds: ids }) })
+
+            .then(r => r.json())
+
+            .then(d => { if (alive && d && d.ok) setBillNo(d.billNo); })
+
+            .catch(() => {});
+
+        return () => { alive = false; };
+
+    }, []); // run once when the bill modal opens
 
 
 
@@ -319,17 +344,6 @@ export default function BillModal({ table, onClose }) {
 
 
 
-        // ---- bump bill serial counter on every settle ----
-
-        if (settings) {
-
-            const nextCounter = (settings.billCounter || 0) + 1;
-
-            updateSettings({ billCounter: nextCounter });
-
-        }
-
-
         onClose();
 
     };
@@ -393,7 +407,7 @@ export default function BillModal({ table, onClose }) {
                         )}
 
                         <p style={{ fontSize: '.75rem', color: '#888', marginTop: '.25rem', fontWeight: 700 }}>
-                            Bill No: {`${(settings?.billPrefix || 'LB')}${String((settings?.billCounter || 0) + 1).padStart(Number(settings?.billPadding) || 4, '0')}`}
+                            Bill No: {billNo ? `${(settings?.billPrefix ?? '')}${String(billNo).padStart(Number(settings?.billPadding) || 0, '0')}` : '—'}
                         </p>
 
                     </div>

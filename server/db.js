@@ -164,7 +164,7 @@ if (db.prepare('SELECT COUNT(*) AS n FROM tables').get().n < MIN_TABLES) {
 // Menu seed versioning: bump MENU_SEED_VERSION when the seed menu grows/changes.
 // On startup, if the stored version is lower, missing seed items are merged in
 // (INSERT OR IGNORE — existing data, edits and staff deletions are preserved).
-const MENU_SEED_VERSION = 2;
+const MENU_SEED_VERSION = 3;
 
 const menuCount = db.prepare('SELECT COUNT(*) AS n FROM menu').get().n;
 const storedMenuVersion = Number(
@@ -177,8 +177,11 @@ if (menuCount === 0 || storedMenuVersion < MENU_SEED_VERSION) {
   db.exec('BEGIN');
   try {
     for (const m of laCasaMenu) {
+      // veg may be a boolean in the seed data — SQLite can't bind booleans;
+      // normalize to the 'V'/'N' string convention used in the DB.
+      const veg = m.veg === true ? 'V' : m.veg === false ? 'N' : (m.veg ?? 'V');
       ins.run(m.id, m.name, m.category || '', m.price, m.description || '', m.image || '', m.available === false ? 0 : 1, j(m.recipe), j(m.variants), j(m.addons),
-        m.veg ?? 'V', m.spiceLevel ?? 'Mild', Number(m.costPrice) || 0);
+        veg, m.spiceLevel ?? 'Mild', Number(m.costPrice) || 0);
     }
     db.exec('COMMIT');
   } catch (e) {
@@ -217,6 +220,12 @@ const orderCols = db.prepare("PRAGMA table_info(orders)").all().map((c) => c.nam
 if (!orderCols.includes('staff_name')) {
   db.exec('ALTER TABLE orders ADD COLUMN staff_name TEXT');
   console.log('✔ orders table: added staff_name column');
+}
+// orders.bill_no — the bill's serial number (per-day sequence starting at 1).
+// Assigned once when the bill is first printed/settled; reprints reuse it.
+if (!orderCols.includes('bill_no')) {
+  db.exec('ALTER TABLE orders ADD COLUMN bill_no INTEGER');
+  console.log('✔ orders table: added bill_no column');
 }
 
 console.log('✔ SQLite database ready:', dbPath);

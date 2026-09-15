@@ -4413,5 +4413,20 @@ export const laCasaMenu = [
     "recipe": [],
     "variants": [],
     "addons": []
+  },
+  {
+    "id": "lc_248",
+    "name": "Water",
+    "category": "Cold Drinks",
+    "price": 20,
+    "description": "Chilled packaged drinking water (1L).",
+    "image": "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=500&q=80",
+    "available": true,
+    "veg": true,
+    "spiceLevel": "",
+    "costPrice": 8,
+    "recipe": [],
+    "variants": [],
+    "addons": []
   }
 ];

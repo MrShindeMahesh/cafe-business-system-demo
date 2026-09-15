@@ -75,11 +75,11 @@ export default function TodaysOrders() {
     const sortedOrders = useMemo(() => {
         return [...filteredOrders].sort((a, b) => {
             if (sortBy === 'settle') {
-                const sa = settleTimeByOrder[a.id] ? new Date(settleTimeByOrder[a.id]).getTime() : Infinity;
-                const sb = settleTimeByOrder[b.id] ? new Date(settleTimeByOrder[b.id]).getTime() : Infinity;
-                if (sa !== sb) return sa - sb;
+                const sa = settleTimeByOrder[a.id] ? new Date(settleTimeByOrder[a.id]).getTime() : -Infinity;
+                const sb = settleTimeByOrder[b.id] ? new Date(settleTimeByOrder[b.id]).getTime() : -Infinity;
+                if (sa !== sb) return sb - sa; // most recently settled first, open orders last
             }
-            return new Date(a.createdAt) - new Date(b.createdAt);
+            return new Date(b.createdAt) - new Date(a.createdAt); // most recently placed first
         });
     }, [filteredOrders, sortBy, settleTimeByOrder]);
 
@@ -184,7 +184,7 @@ export default function TodaysOrders() {
         rep.innerHTML =
             '<div style="text-align:center;margin-bottom:.4rem">' +
                 '<h4 style="font-size:1rem;font-weight:700;margin:2px 0">' + (settings?.cafeName || 'La Casa') + '</h4>' +
-                '<div style="font-size:.75rem;color:#555">Order #' + ord.id + '</div>' +
+                '<div style="font-size:.75rem;color:#555">Order #' + ord.id + (ord.billNo ? '  ·  Bill No: ' + ord.billNo : '') + '</div>' +
             '</div>' +
             '<div style="border-top:1px solid #999;margin-bottom:.3rem;padding:0 .3rem;font-size:.8rem">' +
                 (String(ord.tableId).toUpperCase() === 'PARCEL' ? 'Parcel (Takeaway)' : 'Table ' + String(ord.tableId).padStart(2, '0')) +
@@ -339,7 +339,12 @@ export default function TodaysOrders() {
                             {sortedOrders.length > 0 ? (
                                 sortedOrders.map(ord => (
                                     <tr key={ord.id}>
-                                        <td style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: '.85rem', whiteSpace: 'nowrap' }}>#{ord.id}</td>
+                                        <td style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: '.85rem', whiteSpace: 'nowrap' }}>
+                                            #{ord.id}
+                                            {ord.billNo ? (
+                                                <div style={{ fontSize: '.7rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Bill #{ord.billNo}</div>
+                                            ) : null}
+                                        </td>
                                         <td style={{ fontSize: '.85rem', whiteSpace: 'nowrap' }}>
                                             {String(ord.tableId).toUpperCase() === 'PARCEL'
                                                 ? <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>Parcel</span>

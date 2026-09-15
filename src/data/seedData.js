@@ -25,8 +25,9 @@ export const defaultSettings = {
   serviceChargeEnabled: false,
   serviceChargePercent: 5,
   tipEnabled: false,
-  // Bill serial number configuration
+  // Bill serial number configuration — numbering restarts at 1 every day
+  // (first bill of the day = 1). Prefix/padding are optional cosmetics.
   billCounter: 0,
-  billPrefix: 'LB',
-  billPadding: 4,
+  billPrefix: '',
+  billPadding: 0,
 };
