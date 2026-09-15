@@ -26,6 +26,7 @@ export default function MenuManagement() {
   });
 
   const [currentIngredient, setCurrentIngredient] = useState({ inventoryId: '', amount: 1 });
+  const [autoAddons, setAutoAddons] = useState(false); // when on, empty addons get default extras
 
   const toggleAvailability = (id) => {
     setMenu(menu.map(item => item.id === id ? { ...item, available: !item.available } : item));
@@ -82,11 +83,14 @@ export default function MenuManagement() {
       spiceLevel: newItem.spiceLevel || 'Mild',
       costPrice: Number(newItem.costPrice) || 0,
       variants: newItem.variants && newItem.variants.length ? newItem.variants : (isBeverage ? [{ name: 'Size', options: [{ name: 'Regular', price: 0 }, { name: 'Large', price: 40 }] }] : []),
-      addons: newItem.addons && newItem.addons.length ? newItem.addons : (isBeverage ? [{ name: 'Extra Shot', price: 50 }, { name: 'More Sugar / Sweet', price: 0 }] : [{ name: 'Extra Cheese', price: 40 }, { name: 'Extra Sauce', price: 20 }]),
+      addons: newItem.addons && newItem.addons.length
+        ? newItem.addons
+        : (autoAddons ? (isBeverage ? [{ name: 'Extra Shot', price: 50 }, { name: 'More Sugar / Sweet', price: 0 }] : [{ name: 'Extra Cheese', price: 40 }, { name: 'Extra Sauce', price: 20 }]) : []),
     };
 
     setMenu([itemToAdd, ...menu]);
-    setNewItem({ name: '', category: '', price: '', description: '', image: '', recipe: [] });
+    setNewItem({ name: '', category: '', price: '', description: '', image: '', recipe: [], veg: true, spiceLevel: 'Mild', costPrice: '', variants: [], addons: [] });
+    setAutoAddons(false);
     setIsModalOpen(false);
   };
 
@@ -370,10 +374,14 @@ export default function MenuManagement() {
                   <span style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '.4rem' }}>
                     <Layers size={14} /> Addons
                   </span>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.72rem', fontWeight: 600, color: 'var(--color-text-muted)', cursor: 'pointer', textTransform: 'none' }} title="If ON and you left addons empty, default extras are added automatically">
+                    <input type="checkbox" checked={autoAddons} onChange={(e) => setAutoAddons(e.target.checked)} />
+                    Auto-add defaults (Cheese/Sauce)
+                  </label>
                   <button type="button" className="btn btn-outline btn-sm" onClick={() => setNewItem({ ...newItem, addons: [] })}>Clear All</button>
                 </div>
                 {newItem.addons.length === 0 ? (
-                  <div style={{ fontSize: '.8rem', color: 'var(--color-text-muted)', padding: '.25rem 0' }}>No addons. Click "+ Add Addon" to add extras (e.g. Extra Cheese, Extra Shot).</div>
+                  <div style={{ fontSize: '.8rem', color: 'var(--color-text-muted)', padding: '.25rem 0' }}>No addons — this item will have no extras. Add your own with "+ Add Addon", or tick "Auto-add defaults" above.</div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '.35rem' }}>
                     {newItem.addons.map((a, aIdx) => (
