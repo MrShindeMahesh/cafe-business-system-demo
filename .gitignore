@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# stale legacy project copies — kept on disk, never in the repo
+La Casa/
+La Casa Cafe/
+
 # runtime data — move between deployments via Settings → "Extract/Restore Data File"
 server/cafe.db
 server/cafe.db-*
