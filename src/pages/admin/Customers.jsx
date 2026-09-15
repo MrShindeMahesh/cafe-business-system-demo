@@ -34,10 +34,10 @@ export default function Customers() {
         alert(`Customer "${name}" added!`);
     };
 
-    // Helper to mask phone numbers
-    const maskPhone = (phone) => {
-        if (!phone || phone.length < 4) return 'N/A';
-        return `******${phone.slice(-4)}`;
+    // Format phone for display — full number, grouped like 98765 43210
+    const formatPhone = (phone) => {
+        if (!phone) return 'N/A';
+        return phone.length === 10 ? `${phone.slice(0, 5)} ${phone.slice(5)}` : phone;
     };
 
     return (
@@ -111,9 +111,9 @@ export default function Customers() {
                                         </div>
                                     </td>
 
-                                    {/* MASKED PHONE NUMBER APPLIED HERE */}
-                                    <td style={{ color: 'var(--color-text-secondary)', letterSpacing: '1px' }}>
-                                        {maskPhone(cust.phone)}
+                                    {/* FULL phone number visible */}
+                                    <td style={{ color: 'var(--color-text-secondary)', letterSpacing: '1px', fontWeight: 600 }}>
+                                        {formatPhone(cust.phone)}
                                     </td>
 
                                     <td>
