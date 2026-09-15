@@ -27,6 +27,7 @@ export default function MenuManagement() {
 
   const [currentIngredient, setCurrentIngredient] = useState({ inventoryId: '', amount: 1 });
   const [autoAddons, setAutoAddons] = useState(false); // when on, empty addons get default extras
+  const [editingId, setEditingId] = useState(null); // id of item being edited; null = add mode
 
   const toggleAvailability = (id) => {
     setMenu(menu.map(item => item.id === id ? { ...item, available: !item.available } : item));
@@ -65,6 +66,40 @@ export default function MenuManagement() {
     });
   };
 
+  const blankItem = { name: '', category: '', price: '', description: '', image: '', recipe: [], veg: true, spiceLevel: 'Mild', costPrice: '', variants: [], addons: [] };
+
+  const openAdd = () => {
+    setEditingId(null);
+    setNewItem({ ...blankItem });
+    setAutoAddons(false);
+    setIsModalOpen(true);
+  };
+
+  const openEdit = (item) => {
+    setEditingId(item.id);
+    setNewItem({
+      name: item.name || '',
+      category: item.category || '',
+      price: item.price != null ? String(item.price) : '',
+      description: item.description || '',
+      image: item.image || '',
+      recipe: Array.isArray(item.recipe) ? item.recipe : [],
+      veg: item.veg !== false,
+      spiceLevel: item.spiceLevel || 'Mild',
+      costPrice: item.costPrice != null ? String(item.costPrice) : '',
+      variants: Array.isArray(item.variants) ? item.variants : [],
+      addons: Array.isArray(item.addons) ? item.addons : [],
+    });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setEditingId(null);
+    setIsModalOpen(false);
+    setNewItem({ ...blankItem });
+    setAutoAddons(false);
+  };
+
   const handleAddItem = (e) => {
     e.preventDefault();
 
@@ -79,18 +114,22 @@ export default function MenuManagement() {
       image: newItem.image || 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=500&q=80',
       available: true,
       recipe: newItem.recipe || [],
-      veg: newItem.veg !== undefined ? newItem.veg : (isBeverage ? true : undefined),
+      veg: !!newItem.veg,
       spiceLevel: newItem.spiceLevel || 'Mild',
       costPrice: Number(newItem.costPrice) || 0,
-      variants: newItem.variants && newItem.variants.length ? newItem.variants : (isBeverage ? [{ name: 'Size', options: [{ name: 'Regular', price: 0 }, { name: 'Large', price: 40 }] }] : []),
+      variants: newItem.variants && newItem.variants.length ? newItem.variants : (!editingId && isBeverage ? [{ name: 'Size', options: [{ name: 'Regular', price: 0 }, { name: 'Large', price: 40 }] }] : []),
       addons: newItem.addons && newItem.addons.length
         ? newItem.addons
-        : (autoAddons ? (isBeverage ? [{ name: 'Extra Shot', price: 50 }, { name: 'More Sugar / Sweet', price: 0 }] : [{ name: 'Extra Cheese', price: 40 }, { name: 'Extra Sauce', price: 20 }]) : []),
+        : (!editingId && autoAddons ? (isBeverage ? [{ name: 'Extra Shot', price: 50 }, { name: 'More Sugar / Sweet', price: 0 }] : [{ name: 'Extra Cheese', price: 40 }, { name: 'Extra Sauce', price: 20 }]) : []),
     };
 
-    setMenu([itemToAdd, ...menu]);
-    setNewItem({ name: '', category: '', price: '', description: '', image: '', recipe: [], veg: true, spiceLevel: 'Mild', costPrice: '', variants: [], addons: [] });
-    setAutoAddons(false);
+    if (editingId) {
+      // update the existing item in place — keep its id and availability
+      setMenu(menu.map(i => i.id === editingId ? { ...itemToAdd, id: i.id, available: i.available } : i));
+    } else {
+      setMenu([itemToAdd, ...menu]);
+    }
+    setNewItem({ ...blankItem });
     setIsModalOpen(false);
   };
 
@@ -120,7 +159,7 @@ export default function MenuManagement() {
           {!readOnly && (
             <button
               className="btn btn-primary btn-sm"
-              onClick={() => setIsModalOpen(true)}
+              onClick={openAdd}
             >
               <Plus size={16} /> Add Item
             </button>
@@ -210,7 +249,7 @@ export default function MenuManagement() {
                 <td style={{ textAlign: 'right' }}>
                   {!readOnly && (
                     <>
-                      <button className="action-icon-btn"><Edit2 size={15} /></button>
+                      <button className="action-icon-btn" title="Edit this item" onClick={() => openEdit(item)}><Edit2 size={15} /></button>
                       <button className="action-icon-btn danger" onClick={() => handleDelete(item.id)}>
                         <Trash2 size={15} />
                       </button>
@@ -234,8 +273,8 @@ export default function MenuManagement() {
         <div className="modal-overlay" style={{ zIndex: 999, alignItems: 'center' }}>
           <div className="card animate-scale-up" style={{ width: '100%', maxWidth: '550px', padding: '1.5rem', background: 'var(--color-surface)', maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem' }}>Add Menu Item & Recipe</h3>
-              <button className="action-icon-btn" onClick={() => setIsModalOpen(false)}><X size={20} /></button>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem' }}>{editingId ? 'Edit Menu Item & Recipe' : 'Add Menu Item & Recipe'}</h3>
+              <button className="action-icon-btn" onClick={closeModal}><X size={20} /></button>
             </div>
 
             <form onSubmit={handleAddItem} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -397,8 +436,8 @@ export default function MenuManagement() {
               </div>
 
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={() => setIsModalOpen(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Item & Recipe</button>
+                <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={closeModal}>Cancel</button>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>{editingId ? 'Update Item' : 'Save Item & Recipe'}</button>
               </div>
             </form>
           </div>

@@ -91,11 +91,13 @@ app.post('/api/bills/assign', (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+const normVeg = (v) => (v === false || v === 'N') ? 'N' : 'V';
 const rowMenu = (r) => ({
   id: r.id, name: r.name, category: r.category, price: r.price, description: r.description,
   image: r.image, available: !!r.available,
   recipe: parseJson(r.recipe), variants: parseJson(r.variants), addons: parseJson(r.addons),
-  veg: r.veg, spiceLevel: r.spiceLevel, costPrice: r.costPrice,
+  veg: r.veg === 'N' ? false : r.veg === 'V' ? true : undefined,
+  spiceLevel: r.spiceLevel, costPrice: r.costPrice,
 });
 const rowBill = (r) => ({ id: r.id, tableId: r.table_id, status: r.status, requestedAt: r.requested_at });
 const rowPayment = (r) => ({
@@ -163,7 +165,7 @@ app.post('/api/menu', (req, res) => {
               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
     .run(id, m.name || 'Item', m.category || '', m.price || 0, m.description || '', m.image || '',
       m.available === false ? 0 : 1, j(m.recipe), j(m.variants), j(m.addons),
-      m.veg || 'V', m.spiceLevel || 'Mild', Number(m.costPrice) || 0);
+      m.veg === undefined ? 'V' : normVeg(m.veg), m.spiceLevel || 'Mild', Number(m.costPrice) || 0);
   res.status(201).json(rowMenu(db.prepare('SELECT * FROM menu WHERE id=?').get(id)));
 });
 
@@ -176,7 +178,7 @@ app.patch('/api/menu/:id', (req, res) => {
       req.body.available === undefined ? cur.available : (req.body.available ? 1 : 0),
       j(req.body.recipe ?? parseJson(cur.recipe)), j(req.body.variants ?? parseJson(cur.variants)),
       j(req.body.addons ?? parseJson(cur.addons)),
-      req.body.veg ?? cur.veg, req.body.spiceLevel ?? cur.spiceLevel, Number(req.body.costPrice) ?? cur.costPrice,
+      req.body.veg === undefined ? cur.veg : normVeg(req.body.veg), req.body.spiceLevel ?? cur.spiceLevel, Number(req.body.costPrice) ?? cur.costPrice,
       cur.id);
   res.json(rowMenu(db.prepare('SELECT * FROM menu WHERE id=?').get(cur.id)));
 });
@@ -534,9 +536,9 @@ app.post('/api/print-kot', async (req, res) => {
 // The frontend calls these after local state changes to persist the full array.
 app.put('/api/menu', (req, res) => {
   db.prepare('DELETE FROM menu').run();
-  const ins = db.prepare('INSERT INTO menu (id,name,category,price,description,image,available,recipe,variants,addons) VALUES (?,?,?,?,?,?,?,?,?,?)');
+  const ins = db.prepare('INSERT INTO menu (id,name,category,price,description,image,available,recipe,variants,addons,veg,spiceLevel,costPrice) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)');
   for (const m of req.body || []) {
-    ins.run(m.id || `lc_${Date.now()}_${Math.random()}`, m.name || 'Item', m.category || '', m.price || 0, m.description || '', m.image || '', m.available === false ? 0 : 1, j(m.recipe), j(m.variants), j(m.addons));
+    ins.run(m.id || `lc_${Date.now()}_${Math.random()}`, m.name || 'Item', m.category || '', m.price || 0, m.description || '', m.image || '', m.available === false ? 0 : 1, j(m.recipe), j(m.variants), j(m.addons), normVeg(m.veg), m.spiceLevel || 'Mild', Number(m.costPrice) || 0);
   }
   res.json({ ok: true });
 });
