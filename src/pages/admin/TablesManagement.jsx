@@ -21,6 +21,28 @@ export default function TablesManagement() {
     ? parseInt(String(viewingTableOrders.number || viewingTableOrders.id).replace(/\D/g, ''), 10)
     : null;
 
+  // Floor summary — vacant vs occupied counts (same status rules as the table cards)
+  const floorStats = tables.reduce((acc, table) => {
+    const n = parseInt(String(table.number || table.id).replace(/\D/g, ''), 10);
+    const active = orders.filter(o => parseInt(String(o.tableId).replace(/\D/g, ''), 10) === n && o.status !== 'SERVED' && o.status !== 'CANCELLED');
+    const billReq = bills.some(b => parseInt(String(b.tableId).replace(/\D/g, ''), 10) === n && b.status === 'REQUESTED');
+    if (billReq) acc.requested++;
+    else if (active.length > 0) acc.occupied++;
+    else acc.vacant++;
+    return acc;
+  }, { vacant: 0, occupied: 0, requested: 0 });
+
+  const statChip = (color, label, count) => (
+    <div style={{
+      padding: '.55rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)',
+      background: 'var(--color-surface)', fontSize: '.85rem', fontWeight: 700,
+      display: 'flex', alignItems: 'center', gap: '.5rem',
+    }}>
+      <span style={{ width: 10, height: 10, borderRadius: '50%', background: color, display: 'inline-block', flexShrink: 0 }} />
+      {label}: <span style={{ fontSize: '1rem' }}>{count}</span>
+    </div>
+  );
+
   return (
     <div className="animate-fade-in">
       <div className="table-view-header">
@@ -56,6 +78,14 @@ export default function TablesManagement() {
             <Link2 size={16} /> Copy Order Link
           </button>
         </div>
+      </div>
+
+      {/* Floor summary — live counts */}
+      <div style={{ display: 'flex', gap: '.6rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+        {statChip('#16a34a', 'Vacant', floorStats.vacant)}
+        {statChip('#ea580c', 'Occupied', floorStats.occupied)}
+        {floorStats.requested > 0 && statChip('#dc2626', 'Bill Requested', floorStats.requested)}
+        {statChip('#6b7280', 'Total Tables', tables.length)}
       </div>
 
       <div className="tables-grid">
