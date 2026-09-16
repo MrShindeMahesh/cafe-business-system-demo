@@ -221,7 +221,7 @@ export default function TakeOrder() {
   const total = subtotal;
 
   // Staff tagging — which floor staff is taking this order.
-  const staffName = role && role !== 'admin' ? (role === 'reception' ? 'Reception' : 'Waiter') : '';
+  const staffName = role && role !== 'admin' ? (role === 'reception' ? 'Reception' : 'Captain') : '';
 
   const placeOrder = async () => {
     if (!tableId || cart.length === 0) return;

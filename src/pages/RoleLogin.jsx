@@ -92,7 +92,7 @@ export default function RoleLogin() {
           {isDefaultPins && (
             <p style={{ fontSize: '.7rem', color: 'var(--color-text-muted, #888)', textAlign: 'center', lineHeight: 1.6 }}>
               Default PINs — Admin: {DEFAULT_PINS.admin} · Reception: {DEFAULT_PINS.reception}<br />
-              Waiter: {DEFAULT_PINS.waiter} · Kitchen: {DEFAULT_PINS.kitchen} (change them in Settings)
+              Captain: {DEFAULT_PINS.waiter} · Kitchen: {DEFAULT_PINS.kitchen} (change them in Settings)
             </p>
           )}
         </div>

@@ -3,7 +3,7 @@
 export const ROLES = {
   admin: { key: 'admin', label: 'Admin', tagline: 'Full control', home: '/admin' },
   reception: { key: 'reception', label: 'Reception', tagline: 'Orders, tables & bills', home: '/admin' },
-  waiter: { key: 'waiter', label: 'Waiter', tagline: 'Serve & table status', home: '/admin' },
+  waiter: { key: 'waiter', label: 'Captain', tagline: 'Serve & table status', home: '/admin' },
   kitchen: { key: 'kitchen', label: 'Kitchen', tagline: 'KOT screen', home: '/admin/kitchen' },
 };
 

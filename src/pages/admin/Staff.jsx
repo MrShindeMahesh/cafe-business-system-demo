@@ -96,7 +96,7 @@ export default function Staff() {
           <form onSubmit={handleAddStaff} style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
             <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Name e.g. Ravi" style={{ flex: '1 1 120px', padding: '.5rem .6rem', borderRadius: '6px', border: '1px solid var(--color-border)' }} />
             <select value={newRole} onChange={(e) => setNewRole(e.target.value)} style={{ padding: '.5rem .6rem', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
-              <option value="waiter">Waiter</option>
+              <option value="waiter">Captain</option>
               <option value="reception">Reception</option>
               <option value="kitchen">Kitchen</option>
               <option value="admin">Admin</option>
@@ -141,7 +141,7 @@ export default function Staff() {
 
       {agg.length === 0 ? (
         <div className="card" style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-muted)', marginTop: '1.5rem' }}>
-          No staff-tagged orders yet in this period. Orders taken by Reception or Waiter logins are tagged automatically.
+          No staff-tagged orders yet in this period. Orders taken by Reception or Captain logins are tagged automatically.
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
@@ -176,7 +176,7 @@ export default function Staff() {
           Attendance Log
         </h3>
         {recentAttendance.length === 0 ? (
-          <p className="text-muted" style={{ color: 'var(--color-text-muted)' }}>No attendance recorded yet. Waiters / Reception see a Clock In prompt when they sign in.</p>
+          <p className="text-muted" style={{ color: 'var(--color-text-muted)' }}>No attendance recorded yet. Captains / Reception see a Clock In prompt when they sign in.</p>
         ) : (
           <table className="data-table">
             <thead>

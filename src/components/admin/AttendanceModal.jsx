@@ -3,7 +3,7 @@ import { X, LogIn, LogOut, Clock, CheckCircle2 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { useAuth } from '../../context/AuthContext';
 
-const STAFF_LABEL = { waiter: 'Waiter', reception: 'Reception' };
+const STAFF_LABEL = { waiter: 'Captain', reception: 'Reception' };
 
 export default function AttendanceModal({ onClose }) {
   const { attendance, checkInAttendance, checkOutAttendance } = useData();

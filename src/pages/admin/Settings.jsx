@@ -444,7 +444,7 @@ export default function Settings() {
               </button>
             </h3>
             <p style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)', marginBottom: '1.25rem', lineHeight: 1.6 }}>
-              4-digit PINs for the login screen. Admin has full access; Reception, Waiter and Kitchen see limited panels.
+              4-digit PINs for the login screen. Admin has full access; Reception, Captain and Kitchen see limited panels.
             </p>
             {Object.keys(ROLES).map((r) => (
               <div key={r} style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
@@ -637,14 +637,14 @@ export default function Settings() {
           {/* ─── Waiter phone access (LAN QR) ─── */}
           <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.4rem' }}>
-              <QrCode size={18} /> Waiter Phone Access
+              <QrCode size={18} /> Captain Phone Access
             </h3>
             {lanInfo?.url ? (
               <>
                 <p style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)', marginBottom: '1rem', lineHeight: 1.6 }}>
-                  Waiters can open the POS on their phone (connected to the <b>same Wi-Fi</b> as this computer)
+                  Captains can open the POS on their phone (connected to the <b>same Wi-Fi</b> as this computer)
                   by scanning this QR or typing the address in the phone browser. On the phone, choose the
-                  <b> Waiter </b> role and enter the waiter PIN.
+                  <b> Captain </b> role and enter the captain PIN.
                 </p>
                 {waiterQr && (
                   <img
