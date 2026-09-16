@@ -33,6 +33,7 @@ export default function TakeOrder() {
   // size / extras / quantity before the line lands in the cart.
   const [itemPicker, setItemPicker] = useState(null); // { item, qty, variants: {}, addons: {} }
   const [pickerQty, setPickerQty] = useState(1);
+  const [noteEditingId, setNoteEditingId] = useState(null); // cart line whose kitchen-note input is open
 
   const searchActive = !!searchQuery.trim();
   const categories = [...new Set(menu.map((m) => m.category))];
@@ -63,6 +64,7 @@ export default function TakeOrder() {
       return [
         ...prev,
         {
+          lineId: item.id + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
           menuId: item.id,
           name: item.name,
           price: item.price,
@@ -93,6 +95,7 @@ export default function TakeOrder() {
       item,
       variants: {},
       addons: {},
+      instructions: '',
     });
   };
 
@@ -158,10 +161,11 @@ export default function TakeOrder() {
     setCart((prev) => {
       const existing = prev.find((c) => c.menuId === item.id
         && JSON.stringify(c.customizations.variants) === JSON.stringify(itemPicker.variants)
-        && JSON.stringify(c.customizations.addons) === JSON.stringify(itemPicker.addons));
+        && JSON.stringify(c.customizations.addons) === JSON.stringify(itemPicker.addons)
+        && (c.customizations.instructions || '') === (itemPicker.instructions || ''));
       if (existing) {
         return prev.map((c) =>
-          c.menuId === existing.menuId
+          c.lineId === existing.lineId
             ? { ...c, quantity: c.quantity + pickerQty, calculatedPrice: c.calculatedPrice + linePrice }
             : c
         );
@@ -169,6 +173,7 @@ export default function TakeOrder() {
       return [
         ...prev,
         {
+          lineId: item.id + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
           menuId: item.id,
           name: displayName,
           price: item.price,
@@ -180,7 +185,7 @@ export default function TakeOrder() {
           customizations: {
             variants: { ...itemPicker.variants },
             addons: { ...itemPicker.addons },
-            instructions: '',
+            instructions: itemPicker.instructions || '',
           },
         },
       ];
@@ -188,15 +193,27 @@ export default function TakeOrder() {
     closeItemPicker();
   };
 
-  const changeQty = (menuId, delta) => {
+  const changeQty = (lineId, delta) => {
     setCart((prev) =>
       prev
         .map((c) => {
-          if (c.menuId !== menuId) return c;
+          if (c.lineId !== lineId) return c;
           const q = c.quantity + delta;
           return q <= 0 ? null : { ...c, quantity: q, calculatedPrice: q * c.price };
         })
         .filter(Boolean)
+    );
+  };
+
+  // Kitchen note for a single cart line — stored in customizations.instructions
+  // and mirrored to customizationString so it prints on the KOT and bills.
+  const setLineNote = (lineId, text) => {
+    setCart((prev) =>
+      prev.map((c) => {
+        if (c.lineId !== lineId) return c;
+        const customizations = { ...(c.customizations || { variants: {}, addons: {} }), instructions: text };
+        return { ...c, customizations, customizationString: text };
+      })
     );
   };
 
@@ -246,7 +263,8 @@ export default function TakeOrder() {
     setTableId(String(ord.tableId || ''));
     setName(ord.customerName && ord.customerName !== 'Walk-in Guest' ? ord.customerName : '');
     setPhone(ord.customerPhone || '');
-    setCart((ord.items || []).map((it) => ({
+    setCart((ord.items || []).map((it, idx) => ({
+      lineId: (it.menuId || it.name) + '-e' + idx,
       menuId: it.menuId || it.name,
       name: it.name,
       price: it.quantity ? Number(it.calculatedPrice || it.price || 0) / it.quantity : Number(it.price || 0),
@@ -447,20 +465,41 @@ export default function TakeOrder() {
               {cart.map((c) => {
                 const variantParts = Object.values(c.customizations?.variants || {}).map((v) => v.name).filter(Boolean);
                 const addonParts = Object.values(c.customizations?.addons || {}).map((a) => a.name).filter(Boolean);
+                const note = c.customizations?.instructions || c.customizationString || '';
                 const detail = [...variantParts, ...addonParts].join(' · ');
                 return (
-                  <div key={c.menuId} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '.5rem' }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: '.85rem', fontWeight: 600, lineHeight: 1.3 }}>{c.name}</div>
-                      {detail ? <div style={{ fontSize: '.72rem', color: 'var(--color-text-muted)', marginTop: '.15rem', lineHeight: 1.3 }}>{detail}</div> : null}
+                  <div key={c.lineId || c.menuId} style={{ display: 'flex', flexDirection: 'column', gap: '.3rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '.5rem' }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '.85rem', fontWeight: 600, lineHeight: 1.3 }}>{c.name}</div>
+                        {detail ? <div style={{ fontSize: '.72rem', color: 'var(--color-text-muted)', marginTop: '.15rem', lineHeight: 1.3 }}>{detail}</div> : null}
+                        {note ? <div style={{ fontSize: '.72rem', color: 'var(--color-primary)', marginTop: '.15rem', fontStyle: 'italic', lineHeight: 1.3 }}>📝 {note}</div> : null}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', flexShrink: 0 }}>
+                        <button className="action-icon-btn" onClick={() => changeQty(c.lineId, -1)}><Minus size={13} /></button>
+                        <b style={{ minWidth: '18px', textAlign: 'center', fontSize: '.8rem' }}>{c.quantity}</b>
+                        <button className="action-icon-btn" onClick={() => changeQty(c.lineId, 1)}><Plus size={13} /></button>
+                        <button
+                          className="action-icon-btn"
+                          title="Note for kitchen"
+                          onClick={() => setNoteEditingId(noteEditingId === c.lineId ? null : c.lineId)}
+                          style={note ? { color: 'var(--color-primary)' } : undefined}
+                        ><Pencil size={13} /></button>
+                        <button className="action-icon-btn danger" onClick={() => changeQty(c.lineId, -c.quantity)}><Trash2 size={13} /></button>
+                      </div>
+                      <span style={{ fontSize: '.85rem', fontWeight: 700, minWidth: '52px', textAlign: 'right', flexShrink: 0 }}>₹{c.calculatedPrice}</span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', flexShrink: 0 }}>
-                      <button className="action-icon-btn" onClick={() => changeQty(c.menuId, -1)}><Minus size={13} /></button>
-                      <b style={{ minWidth: '18px', textAlign: 'center', fontSize: '.8rem' }}>{c.quantity}</b>
-                      <button className="action-icon-btn" onClick={() => changeQty(c.menuId, 1)}><Plus size={13} /></button>
-                      <button className="action-icon-btn danger" onClick={() => changeQty(c.menuId, -c.quantity)}><Trash2 size={13} /></button>
-                    </div>
-                    <span style={{ fontSize: '.85rem', fontWeight: 700, minWidth: '52px', textAlign: 'right', flexShrink: 0 }}>₹{c.calculatedPrice}</span>
+                    {noteEditingId === c.lineId && (
+                      <input
+                        type="text"
+                        autoFocus
+                        placeholder="Note for kitchen (e.g. less spicy, no onion)…"
+                        value={c.customizations?.instructions || ''}
+                        onChange={(e) => setLineNote(c.lineId, e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') setNoteEditingId(null); }}
+                        style={{ padding: '.4rem .55rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-primary)', fontSize: '.8rem', width: '100%', boxSizing: 'border-box' }}
+                      />
+                    )}
                   </div>
                 );
               })}
@@ -592,6 +631,20 @@ export default function TakeOrder() {
                   </div>
                 </div>
               )}
+              {/* Note for kitchen */}
+              <div style={{ marginBottom: '1rem' }}>
+                <p style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--color-text-muted)', marginBottom: '.35rem' }}>
+                  Note for kitchen (optional)
+                </p>
+                <input
+                  type="text"
+                  placeholder="e.g. less spicy, no onion, extra crisp…"
+                  value={itemPicker.instructions || ''}
+                  onChange={(e) => setItemPicker({ ...itemPicker, instructions: e.target.value })}
+                  style={{ width: '100%', padding: '.5rem .6rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', fontSize: '.85rem', boxSizing: 'border-box' }}
+                />
+              </div>
+
               {/* Live line price */}
               <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '1rem' }}>
                 <span style={{ fontSize: '.8rem', color: 'var(--color-text-muted)' }}>Line total</span>
