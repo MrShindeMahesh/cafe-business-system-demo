@@ -34,7 +34,7 @@ const getRange = (key) => {
 };
 
 export default function Analytics() {
-  const { orders, customers, inventory, payments, expenses, settings } = useData();
+  const { orders, customers, inventory, payments, expenses, settings, tables = [] } = useData();
   const [preset, setPreset] = useState('today');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
@@ -76,6 +76,14 @@ export default function Analytics() {
   const totalRevenue = rangePayments.reduce((s, p) => s + (Number(p.amount) || 0), 0) + legacySettledRevenue;
   const totalOrders = filteredOrders.length;
   const averageOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(0) : 0;
+
+  // Tables — total count + how many are occupied right now (active, unsettled orders)
+  const occupiedTables = new Set(
+    orders
+      .filter((o) => o.status !== 'SERVED' && o.status !== 'CANCELLED')
+      .map((o) => parseInt(String(o.tableId).replace(/\D/g, ''), 10))
+      .filter(Number.isFinite)
+  ).size;
 
   // 3. Aggregate Item Stats for the charts
   const itemStats = useMemo(() => {
@@ -313,6 +321,14 @@ export default function Analytics() {
           <div className="kpi-label"><Users size={14} style={{display:'inline', verticalAlign:'middle'}}/> All Time Customers</div>
           <div>
             <span className="kpi-value">{customers.length}</span>
+          </div>
+        </div>
+
+        <div className="kpi-card">
+          <div className="kpi-label"><Grid size={14} style={{display:'inline', verticalAlign:'middle'}}/> Tables</div>
+          <div>
+            <span className="kpi-value">{tables.length}</span>
+            <span style={{ fontSize: '.78rem', color: 'var(--color-text-muted)', marginLeft: '.5rem' }}>{occupiedTables} occupied now</span>
           </div>
         </div>
 
