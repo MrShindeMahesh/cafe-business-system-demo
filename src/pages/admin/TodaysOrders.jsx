@@ -251,6 +251,10 @@ export default function TodaysOrders() {
                 (payment ? '<div style="display:flex;justify-content:space-between;font-size:.75rem;color:#666;margin-top:.5rem"><span>Paid via ' + (payment.paymentMode || 'Cash') + '</span><span></span></div>' : '') +
             '</div>' +
             ((payment?.paymentMode === 'UPI' && selectedQr) ? '<div style="text-align:center;margin-top:.75rem;padding-top:.75rem;border-top:1px dashed #ddd"><p style="font-size:.8rem;font-weight:700;color:#111;margin-bottom:.5rem">Scan to pay' + (selectedQr.label ? ' • ' + selectedQr.label : '') + '</p><img src="' + selectedQr.path + '" alt="UPI QR" style="width:140px;height:140px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ddd;display:block;margin:0 auto" /></div>' : '') +
+            '<div style="text-align:center;margin-top:.9rem;padding-top:.75rem;border-top:1px dashed #ddd">' +
+                '<p style="font-size:.95rem;font-weight:700;color:#111;margin:0">Thank You! Visit Again 🙏</p>' +
+                '<p style="font-size:.78rem;color:#666;margin:.3rem 0 0">— ' + (s.cafeName || 'La Casa') + ' • Come back soon —</p>' +
+            '</div>' +
             '</div>';
         printPortal(rep);
     };

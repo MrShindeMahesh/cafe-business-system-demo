@@ -259,7 +259,8 @@ export async function printReceipt({ table, orders: tableOrders, settings: custo
   }
   out += boldOn + doubleH + row('GRAND TOTAL', `Rs.${grandTotal}`) + normalSize + boldOff + '\n';
   out += line + '\n';
-  out += alignCenter + 'Thank you! Visit again :)\n';
+  out += alignCenter + boldOn + 'Thank You! Visit Again' + boldOff + '\n';
+  out += alignCenter + `- ${cafe} - Come back soon -` + '\n';
   out += feed(3) + cut;
 
   if (!ip) {

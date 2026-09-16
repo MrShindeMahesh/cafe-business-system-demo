@@ -530,6 +530,12 @@ export default function BillModal({ table, onClose }) {
                             <img src={selectedQr.path} alt={`UPI QR — ${selectedQr.label || 'Pay'}`} style={{ width: '140px', height: '140px', objectFit: 'contain', background: '#fff', borderRadius: '8px', border: '1px solid #ddd', display: 'block', margin: '0 auto' }} />
                         </div>
                     )}
+
+                    {/* Thank-you footer — prints on every bill */}
+                    <div style={{ textAlign: 'center', marginTop: '.9rem', paddingTop: '.75rem', borderTop: '1px dashed #ddd' }}>
+                        <p style={{ fontSize: '.95rem', fontWeight: 700, color: '#111', margin: 0 }}>Thank You! Visit Again 🙏</p>
+                        <p style={{ fontSize: '.78rem', color: '#666', margin: '.3rem 0 0' }}>— {settings?.cafeName || 'La Casa'} • Come back soon —</p>
+                    </div>
                 </div>
                 {/* discount + payment mode — OUTSIDE printable-receipt (interactive UI, not printed) */}
                 <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem', fontSize: '.85rem' }}>
