@@ -173,7 +173,7 @@ export async function printReceipt({ table, orders: tableOrders, settings: custo
   // derive from the orders' stored bill_no, else the settings counter.
   let billNo = preassigned ?? tableOrders.map(o => o.billNo).find(Boolean);
   if (!billNo) {
-    const nextCounter = (settings.billCounter || 0) + 1;
+    const nextCounter = Number(settings.billCounter || 0) + 1;
     billNo = (settings.billPrefix || '') + String(nextCounter).padStart(Number(settings.billPadding) || 0, '0');
   }
   const billNoLabel = (settings.billPrefix || '') + String(billNo).padStart(Number(settings.billPadding) || 0, '0');
