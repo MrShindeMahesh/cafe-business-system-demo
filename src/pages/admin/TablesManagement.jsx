@@ -32,7 +32,7 @@ export default function TablesManagement() {
     return acc;
   }, { vacant: 0, occupied: 0, requested: 0 });
 
-  const statChip = (color, label, count) => (
+    const statChip = (color, label, count) => (
     <div style={{
       padding: '.55rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)',
       background: 'var(--color-surface)', fontSize: '.85rem', fontWeight: 700,
@@ -42,6 +42,16 @@ export default function TablesManagement() {
       {label}: <span style={{ fontSize: '1rem' }}>{count}</span>
     </div>
   );
+
+  // Color each floor tile by table-number band (1-10 / 11-20 / 21-30 / 31-40 /
+  // 41-50) so table clusters are instantly recognizable. A table that turns over
+  // keeps its color (the band is by number, not status).
+  const BAND_COLORS = ['#C68B59', '#8B4513', '#A0522D', '#CD853F', '#6B4423'];
+  const bandColor = (n) =>
+    Number.isFinite(n) && n > 0
+      ? BAND_COLORS[Math.min(Math.floor((n - 1) / 10), BAND_COLORS.length - 1)] || BAND_COLORS[BAND_COLORS.length - 1]
+      : 'var(--color-primary)';
+
 
   return (
     <div className="animate-fade-in">
@@ -80,12 +90,22 @@ export default function TablesManagement() {
         </div>
       </div>
 
-      {/* Floor summary — live counts */}
+            {/* Floor summary — live counts */}
       <div style={{ display: 'flex', gap: '.6rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
         {statChip('#16a34a', 'Vacant', floorStats.vacant)}
         {statChip('#ea580c', 'Occupied', floorStats.occupied)}
         {floorStats.requested > 0 && statChip('#dc2626', 'Bill Requested', floorStats.requested)}
         {statChip('#6b7280', 'Total Tables', tables.length)}
+      </div>
+
+      {/* Table-number band legend (1-10 / 11-20 / 21-30 / 31-40 / 41-50) */}
+      <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+        {legendBands.map(b => (
+          <span key={b.label} style={{ display: 'inline-flex', alignItems: 'center', gap: '.3rem', fontSize: '.75rem', color: 'var(--color-text-secondary)' }}>
+            <span style={{ width: 10, height: 10, borderRadius: '50%', background: b.color, display: 'inline-block', flexShrink: 0 }} />
+            {b.label}
+          </span>
+        ))}
       </div>
 
       <div className="tables-grid">
@@ -121,7 +141,7 @@ export default function TablesManagement() {
               onClick={() => tableOrders.length > 0 && setViewingTableOrders(table)}
               style={{ cursor: tableOrders.length > 0 ? 'pointer' : 'default' }}
             >
-              <div className="table-number">{table.number}</div>
+                            <div className="table-number" style={{ color: bandColor(tableNumClean) }}>{table.number}</div>
               <div className={pillClasses[displayStatus]}>{statusLabels[displayStatus]}</div>
 
               {tableOrders.length > 0 && (
