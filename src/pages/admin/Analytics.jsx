@@ -79,8 +79,8 @@ export default function Analytics() {
 
   // Tables SERVED today — each table counts ONCE, no matter how many orders or
   // bills it had: 2 orders on table 4 (and no other table used) = 1 table served.
-  // A table counts if it was billed/settled today OR an order was placed on it
-  // today. PARCEL is takeaway, so it never counts as a table.
+  // Source = orders placed today (a table turning over twice still counts once),
+  // which is what people actually compare against the "Total Orders" KPI.
   // Table numbers are stored inconsistently (e.g. "03" vs "3"), so every table
   // number is normalized to its digits before comparing → "03" === "3".
   const dayKeyOf = (iso) => (iso ? new Date(iso).toLocaleDateString('en-IN') : null);
@@ -97,12 +97,10 @@ export default function Analytics() {
   const tableBillsToday = (payments || []).filter(
     (p) => p.settledAt && isRealTable(p.tableId) && dayKeyOf(p.settledAt) === todayKey
   );
-  const tablesServedToday = new Set([
-    ...todaysTableOrders.map((o) => tableNo(o.tableId)),
-    ...tableBillsToday.map((p) => tableNo(p.tableId)),
-  ]).size;
+  const tablesServedToday = new Set(todaysTableOrders.map((o) => tableNo(o.tableId))).size;
   const ticketsToday = todaysTableOrders.length;
   const billsToday = tableBillsToday.length;
+
 
 
   // 3. Aggregate Item Stats for the charts
@@ -349,7 +347,7 @@ export default function Analytics() {
           <div>
             <span className="kpi-value">{tablesServedToday}</span>
             <span style={{ fontSize: '.78rem', color: 'var(--color-text-muted)', marginLeft: '.5rem' }}>
-              {ticketsToday} ticket(s) · {billsToday} bill(s) settled
+              {ticketsToday} order(s) · {billsToday} bill(s) settled
             </span>
           </div>
         </div>
