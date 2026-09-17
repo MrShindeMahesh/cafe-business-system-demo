@@ -29,6 +29,15 @@ export default function Settings() {
     } catch { return null; }
   })();
 
+  // ── Live login presence (who is logged in right now) ──
+  const [presence, setPresence] = useState(null);
+  useEffect(() => {
+    const load = () => fetch('/api/presence').then(r => r.json()).then(setPresence).catch(() => {});
+    load();
+    const iv = setInterval(load, 10000);
+    return () => clearInterval(iv);
+  }, []);
+
   const handleClearData = () => {
     if (window.confirm("WARNING: This will permanently delete ALL local data (orders, menu, inventory, customers) and reset to defaults. Are you sure?")) {
       clearLocalDb();
@@ -434,6 +443,47 @@ export default function Settings() {
             <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
               Tip: use "⬇ Extract Data File" to grab a portable .db copy (move to a new machine), and "⬆ Restore Data File" on the new deployment to load it. A safety backup is taken before every restore.
             </p>
+          </div>
+
+          {/* ─── Logged in now (live) ─── */}
+          <div className="card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', marginBottom: '.75rem', color: 'var(--color-primary)' }}>
+              Logged In Now
+            </h3>
+            <p style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)', marginBottom: '1rem', lineHeight: 1.6 }}>
+              Live count of devices currently signed in to the POS (updates every 10 seconds). A device counts as online
+              while its tab is open; closing the tab or logging out removes it within seconds.
+            </p>
+            {presence ? (
+              <div style={{ display: 'flex', gap: '.6rem', flexWrap: 'wrap' }}>
+                {[
+                  ['admin', 'Admin'],
+                  ['reception', 'Reception'],
+                  ['waiter', 'Captain'],
+                  ['kitchen', 'Chef'],
+                ].map(([key, label]) => {
+                  const n = presence.online?.[key] || 0;
+                  return (
+                    <div key={key} style={{
+                      padding: '.5rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)',
+                      background: 'var(--color-bg)', fontSize: '.85rem', fontWeight: 700,
+                      display: 'flex', alignItems: 'center', gap: '.5rem',
+                    }}>
+                      <span style={{
+                        width: 10, height: 10, borderRadius: '50%',
+                        background: n > 0 ? '#16a34a' : '#cbd5e1', display: 'inline-block', flexShrink: 0,
+                      }} />
+                      {label}: <span style={{ fontSize: '1rem' }}>{n}</span>
+                    </div>
+                  );
+                })}
+                <div style={{ padding: '.5rem 1rem', borderRadius: 'var(--radius-sm)', fontSize: '.85rem', fontWeight: 700, color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center' }}>
+                  Total online: {presence.total || 0}
+                </div>
+              </div>
+            ) : (
+              <p style={{ fontSize: '.85rem', color: 'var(--color-text-muted)' }}>Loading…</p>
+            )}
           </div>
 
           <div className="card" style={{ padding: '2rem' }}>

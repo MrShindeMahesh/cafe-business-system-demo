@@ -961,6 +961,29 @@ setInterval(() => {
   try { doBackup(); } catch (e) { console.error('auto-backup failed:', e.message); }
 }, 30 * 60 * 1000);
 
+// ---- presence: who is currently logged in (per device/tab session) ----
+// Each signed-in tab heartbeats every 15s; sessions expire after 45s of silence.
+const presence = new Map(); // sessionId -> { role, lastSeen }
+const PRESENCE_TTL = 45000;
+app.post('/api/presence', (req, res) => {
+  const { sessionId, role } = req.body || {};
+  if (!sessionId) return res.status(400).json({ error: 'sessionId required' });
+  presence.set(String(sessionId), { role: String(role || ''), lastSeen: Date.now() });
+  res.json({ ok: true });
+});
+app.post('/api/presence/leave', (req, res) => {
+  const { sessionId } = req.body || {};
+  if (sessionId) presence.delete(String(sessionId));
+  res.json({ ok: true });
+});
+app.get('/api/presence', (req, res) => {
+  const cutoff = Date.now() - PRESENCE_TTL;
+  for (const [id, p] of presence) if (p.lastSeen < cutoff) presence.delete(id);
+  const online = { admin: 0, reception: 0, waiter: 0, kitchen: 0 };
+  for (const p of presence.values()) if (online[p.role] !== undefined) online[p.role]++;
+  res.json({ online, total: Object.values(online).reduce((a, b) => a + b, 0) });
+});
+
 // -------- serve the built frontend (production / npm start) --------
 // Serve uploaded assets (logo, etc.)
 app.use(express.static(path.join(__dirname, '..', 'public')));
