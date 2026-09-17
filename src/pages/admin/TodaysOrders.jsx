@@ -215,11 +215,12 @@ export default function TodaysOrders() {
             if (spice) tag += `${spice} `;
             if (cost) tag += `cost ${cost.toFixed(2)}`;
             const linePrice = item.calculatedPrice ?? (Number(item.unitPrice) || 0) * (item.quantity || 1);
-            return '<div style="display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:.2rem">' +
+            return '<div style="display:flex;justify-content:space-between;font-size:1.25rem;margin-bottom:.3rem">' +
                 '<div style="flex:1;min-width:0">' +
                     '<div>' + item.quantity + ' × ' + item.name + '</div>' +
-                    (mods.length ? '<div style="font-size:.75rem;color:#666;margin-top:.15rem">' + mods.join(', ') + '</div>' : '') +
-                    (tag.trim() ? '<div style="font-size:.7rem;color:#888;margin-top:.1rem">' + tag.trim() + '</div>' : '') +
+                    (mods.length ? '<div style="font-size:1.05rem;color:#666;margin-top:.15rem">' + mods.join(', ') + '</div>' : '') +
+                    (tag.trim() ? '<div style="font-size:1rem;color:#888;margin-top:.1rem">' + tag.trim() + '</div>' : '') +
+                    (item.customizationString ? '<div style="font-size:1rem;color:#8B4513;margin-top:.1rem;font-weight:600">Note: ' + item.customizationString + '</div>' : '') +
                 '</div>' +
                 '<span style="font-weight:600;flex-shrink:0">₹' + linePrice + '</span>' +
             '</div>';
@@ -231,30 +232,30 @@ export default function TodaysOrders() {
             '<div style="background:#fff;color:#111;padding:1rem">' +
             '<div style="text-align:center;margin-bottom:1rem">' +
                 (s.cafeLogo ? '<img src="' + s.cafeLogo + '" alt="logo" style="width:56px;height:56px;object-fit:contain;margin:0 auto 4px;display:block" />' : '') +
-                '<h4 style="font-size:1.6rem;font-weight:700;margin:4px 0">' + (s.cafeName || 'La Casa') + '</h4>' +
-                '<p style="font-size:.75rem;color:#666">' + (isParcel ? 'Parcel (Takeaway)' : 'Table #' + String(ord.tableId)) + ' • 1 Ticket(s)</p>' +
-                '<p style="font-size:.75rem;color:#666">' + new Date(billDate).toLocaleString() + '</p>' +
-                (s.contact ? '<p style="font-size:.75rem;color:#666;margin-top:.15rem">Ph: ' + s.contact + '</p>' : '') +
-                (gstEnabled ? '<p style="font-size:.7rem;color:#888;margin-top:.25rem">GST @' + gstRate + '%' + (gstIn ? ' - GSTIN: ' + gstIn : '') + '</p>' : '') +
-                (s.fssaiNo ? '<p style="font-size:.7rem;color:#888;margin-top:.1rem">FSSAI No: ' + s.fssaiNo + '</p>' : '') +
-                '<p style="font-size:.75rem;color:#888;margin-top:.25rem;font-weight:700">Bill No: ' + billNoLabel + '</p>' +
+                '<h4 style="font-size:2.4rem;font-weight:700;margin:6px 0;letter-spacing:.5px">' + (s.cafeName || 'La Casa') + '</h4>' +
+                '<p style="font-size:1.05rem;color:#666">' + (isParcel ? 'Parcel (Takeaway)' : 'Table #' + String(ord.tableId)) + ' • 1 Ticket(s)</p>' +
+                '<p style="font-size:1.05rem;color:#666">' + new Date(billDate).toLocaleString() + '</p>' +
+                (s.contact ? '<p style="font-size:1.05rem;color:#666;margin-top:.15rem">Ph: ' + s.contact + '</p>' : '') +
+                (gstEnabled ? '<p style="font-size:1rem;color:#888;margin-top:.25rem">GST @' + gstRate + '%' + (gstIn ? ' - GSTIN: ' + gstIn : '') + '</p>' : '') +
+                (s.fssaiNo ? '<p style="font-size:1rem;color:#888;margin-top:.1rem">FSSAI No: ' + s.fssaiNo + '</p>' : '') +
+                '<p style="font-size:1.6rem;color:#111;margin-top:.45rem;font-weight:700;letter-spacing:.5px">Bill No: ' + billNoLabel + '</p>' +
             '</div>' +
             '<div style="margin-bottom:1rem;border-bottom:1px dashed #ddd;padding-bottom:.5rem">' +
-                '<div style="font-size:.75rem;font-weight:700;color:#888;margin-bottom:.25rem">Ticket #' + ord.id + '</div>' +
+                '<div style="font-size:1rem;font-weight:700;color:#888;margin-bottom:.3rem">Ticket #' + ord.id + '</div>' +
                 itemRows +
             '</div>' +
             '<div style="border-top:1px dashed #ddd;padding-top:.75rem;margin-top:.75rem">' +
-                '<div style="display:flex;justify-content:space-between;font-size:.8125rem;color:#555;margin-bottom:.5rem"><span>Subtotal</span><span>₹' + subtotal + '</span></div>' +
-                (gstEnabled && gstAmount > 0 ? '<div style="display:flex;justify-content:space-between;font-size:.8125rem;color:#555;margin-bottom:.5rem"><span>GST @' + gstRate + '%' + (gstIn ? ' (' + gstIn + ')' : '') + '</span><span>₹' + gstAmount + '</span></div>' : '') +
-                (scEnabled && scAmount > 0 ? '<div style="display:flex;justify-content:space-between;font-size:.8125rem;color:#555;margin-bottom:.5rem"><span>Svc.Charge @' + scPct + '%</span><span>₹' + scAmount + '</span></div>' : '') +
-                (discount > 0 ? '<div style="display:flex;justify-content:space-between;font-size:.8125rem;color:#b91c1c;margin-bottom:.5rem"><span>Discount</span><span>− ₹' + discount + '</span></div>' : '') +
-                '<div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:700;border-top:1px solid #111;padding-top:.5rem;color:#111"><span>Grand Total</span><span>₹' + finalTotal + '</span></div>' +
-                (payment ? '<div style="display:flex;justify-content:space-between;font-size:.75rem;color:#666;margin-top:.5rem"><span>Paid via ' + (payment.paymentMode || 'Cash') + '</span><span></span></div>' : '') +
+                '<div style="display:flex;justify-content:space-between;font-size:1.15rem;color:#555;margin-bottom:.5rem"><span>Subtotal</span><span>₹' + subtotal + '</span></div>' +
+                (gstEnabled && gstAmount > 0 ? '<div style="display:flex;justify-content:space-between;font-size:1.15rem;color:#555;margin-bottom:.5rem"><span>GST @' + gstRate + '%' + (gstIn ? ' (' + gstIn + ')' : '') + '</span><span>₹' + gstAmount + '</span></div>' : '') +
+                (scEnabled && scAmount > 0 ? '<div style="display:flex;justify-content:space-between;font-size:1.15rem;color:#555;margin-bottom:.5rem"><span>Svc.Charge @' + scPct + '%</span><span>₹' + scAmount + '</span></div>' : '') +
+                (discount > 0 ? '<div style="display:flex;justify-content:space-between;font-size:1.15rem;color:#b91c1c;margin-bottom:.5rem"><span>Discount</span><span>− ₹' + discount + '</span></div>' : '') +
+                '<div style="display:flex;justify-content:space-between;font-size:1.5rem;font-weight:700;border-top:1px solid #111;padding-top:.5rem;color:#111"><span>Grand Total</span><span>₹' + finalTotal + '</span></div>' +
+                (payment ? '<div style="display:flex;justify-content:space-between;font-size:1rem;color:#666;margin-top:.5rem"><span>Paid via ' + (payment.paymentMode || 'Cash') + '</span><span></span></div>' : '') +
             '</div>' +
-            ((payment?.paymentMode === 'UPI' && selectedQr) ? '<div style="text-align:center;margin-top:.75rem;padding-top:.75rem;border-top:1px dashed #ddd"><p style="font-size:.8rem;font-weight:700;color:#111;margin-bottom:.5rem">Scan to pay' + (selectedQr.label ? ' • ' + selectedQr.label : '') + '</p><img src="' + selectedQr.path + '" alt="UPI QR" style="width:140px;height:140px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ddd;display:block;margin:0 auto" /></div>' : '') +
+            ((payment?.paymentMode === 'UPI' && selectedQr) ? '<div style="text-align:center;margin-top:.75rem;padding-top:.75rem;border-top:1px dashed #ddd"><p style="font-size:1.1rem;font-weight:700;color:#111;margin-bottom:.5rem">Scan to pay' + (selectedQr.label ? ' • ' + selectedQr.label : '') + '</p><img src="' + selectedQr.path + '" alt="UPI QR" style="width:150px;height:150px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ddd;display:block;margin:0 auto" /></div>' : '') +
             '<div style="text-align:center;margin-top:.9rem;padding-top:.75rem;border-top:1px dashed #ddd">' +
-                '<p style="font-size:.95rem;font-weight:700;color:#111;margin:0">Thank You! Visit Again 🙏</p>' +
-                '<p style="font-size:.78rem;color:#666;margin:.3rem 0 0">— ' + (s.cafeName || 'La Casa') + ' • Come back soon —</p>' +
+                '<p style="font-size:1.35rem;font-weight:700;color:#111;margin:0">Thank You! Visit Again 🙏</p>' +
+                '<p style="font-size:1.05rem;color:#666;margin:.3rem 0 0">— ' + (s.cafeName || 'La Casa') + ' • Come back soon —</p>' +
             '</div>' +
             '</div>';
         printPortal(rep);

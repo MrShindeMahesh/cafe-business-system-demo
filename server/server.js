@@ -55,31 +55,53 @@ const rowOrder = (r) => ({
 // Sequence resets every day: the first bill of the day is 1, next is 2, ...
 // Assigned ONCE when the bill is first printed/settled and stored on the
 // orders — so reprinting the same bill always shows the same number.
-const billNoForToday = () => {
-  const today = new Date();
-  const ds = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+//
+// The daily sequence is kept in private settings keys (`_billDay` / `_billSeq`,
+// hidden from the frontend) so it follows the day the BILL is printed — not the
+// day the order happened to be created. Without this, an order taken at 23:55
+// and billed at 00:05 would restart the next day's sequence and reuse number 1.
+const dayStamp = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const getSettingRaw = (key) => db.prepare('SELECT value FROM settings WHERE key = ?').get(key)?.value;
+const setSettingRaw = (key, value) => db.prepare('INSERT OR REPLACE INTO settings (key,value) VALUES (?,?)').run(key, String(value));
+
+// Highest number already stored on a bill printed on `ds` (legacy safety net).
+const maxBillNoOnDay = (ds) => {
   let max = 0;
   for (const r of db.prepare('SELECT bill_no, created_at FROM orders WHERE bill_no IS NOT NULL').all()) {
     const d = new Date(r.created_at);
-    const s = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    if (s === ds && Number(r.bill_no) > max) max = Number(r.bill_no);
+    if (isNaN(d.getTime()) || dayStamp(d) !== ds) continue;
+    const n = Number(r.bill_no);
+    if (Number.isFinite(n) && n > max) max = n;
   }
-  return max + 1;
+  return max;
+};
+
+const billNoForToday = () => {
+  const ds = dayStamp(new Date());
+  const lastSeq = getSettingRaw('_billDay') === ds ? Number(getSettingRaw('_billSeq') || 0) : 0;
+  // never go backwards: respect numbers already used today (older builds / restores)
+  const next = Math.max(Number.isFinite(lastSeq) ? lastSeq : 0, maxBillNoOnDay(ds)) + 1;
+  setSettingRaw('_billDay', ds);
+  setSettingRaw('_billSeq', next);
+  return next;
 };
 
 // Assign a bill number to a set of order ids (one consolidated bill).
-// If any of the orders already carries a bill number, it is reused as-is.
+// If any of the orders already carries a bill number, it is reused as-is and
+// stamped onto the remaining tickets of the same bill (they were printed later).
 const assignBillNumbers = (orderIds) => {
   const ids = [...new Set((orderIds || []).map(String).filter(Boolean))];
   if (!ids.length) return null;
   const get = db.prepare('SELECT id, bill_no FROM orders WHERE id = ?');
+  let existing = null;
   for (const id of ids) {
     const r = get.get(id);
-    if (r && r.bill_no) return r.bill_no; // reprint — keep the same number
+    if (r && r.bill_no) { existing = r.bill_no; break; } // reprint — keep the same number
   }
-  const billNo = billNoForToday();
-  const upd = db.prepare('UPDATE orders SET bill_no = ? WHERE id = ? AND bill_no IS NULL');
-  withTransaction(() => { for (const id of ids) upd.run(billNo, id); });
+  const billNo = existing ?? billNoForToday();
+  // stamp every ticket of THIS bill; orders already on a different bill are left alone
+  const upd = db.prepare('UPDATE orders SET bill_no = ? WHERE id = ? AND (bill_no IS NULL OR bill_no = ?)');
+  withTransaction(() => { for (const id of ids) upd.run(billNo, id, billNo); });
   return billNo;
 };
 
@@ -554,10 +576,20 @@ app.put('/api/inventory', (req, res) => {
 });
 
 app.put('/api/orders', (req, res) => {
+  // Keep the bill numbers already stamped on this server: the frontend sends a
+  // full replace of the orders list, and a client whose state was loaded before
+  // a bill was numbered would otherwise wipe every bill_no (making reprints show
+  // "—" and burning fresh numbers on the next print).
+  const storedBillNo = new Map(
+    db.prepare('SELECT id, bill_no FROM orders WHERE bill_no IS NOT NULL').all().map((r) => [r.id, r.bill_no])
+  );
   db.prepare('DELETE FROM orders').run();
-  const ins = db.prepare('INSERT INTO orders (id,table_id,items,subtotal,total,customer_name,customer_phone,status,created_at) VALUES (?,?,?,?,?,?,?,?,?)');
+  const ins = db.prepare('INSERT INTO orders (id,table_id,items,subtotal,total,customer_name,customer_phone,status,created_at,bill_no) VALUES (?,?,?,?,?,?,?,?,?,?)');
   for (const o of req.body || []) {
-    ins.run(o.id || `ord_${Date.now()}_${Math.random()}`, String(o.tableId || ''), j(o.items || []), o.subtotal || 0, o.total || 0, o.customerName || '', o.customerPhone || '', o.status || 'NEW', o.createdAt || new Date().toISOString());
+    const id = o.id || `ord_${Date.now()}_${Math.random()}`;
+    const incoming = o.billNo != null && o.billNo !== '' ? Number(o.billNo) : null;
+    const kept = Number.isFinite(incoming) ? incoming : (storedBillNo.get(id) ?? null);
+    ins.run(id, String(o.tableId || ''), j(o.items || []), o.subtotal || 0, o.total || 0, o.customerName || '', o.customerPhone || '', o.status || 'NEW', o.createdAt || new Date().toISOString(), kept);
   }
   res.json({ ok: true });
 });

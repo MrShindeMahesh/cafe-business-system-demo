@@ -386,33 +386,33 @@ export default function BillModal({ table, onClose }) {
 
                         )}
 
-                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', fontWeight: 700, margin: '4px 0' }}>
+                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.4rem', fontWeight: 700, margin: '6px 0', letterSpacing: '.5px' }}>
 
                             {settings?.cafeName || 'La Casa'}
 
                         </h4>
 
-                        <p style={{ fontSize: '.75rem', color: '#666' }}>{isParcel ? 'Parcel (Takeaway)' : `Table #${table.number}`} • {tableOrders.length} Ticket(s)</p>
+                        <p style={{ fontSize: '1.05rem', color: '#666' }}>{isParcel ? 'Parcel (Takeaway)' : `Table #${table.number}`} • {tableOrders.length} Ticket(s)</p>
 
-                        <p style={{ fontSize: '.75rem', color: '#666' }}>{new Date().toLocaleString()}</p>
+                        <p style={{ fontSize: '1.05rem', color: '#666' }}>{new Date().toLocaleString()}</p>
 
                         {settings?.contact && (
-                            <p style={{ fontSize: '.75rem', color: '#666', marginTop: '.15rem' }}>Ph: {settings.contact}</p>
+                            <p style={{ fontSize: '1.05rem', color: '#666', marginTop: '.15rem' }}>Ph: {settings.contact}</p>
                         )}
 
                         {gstEnabled && (
-                            <p style={{ fontSize: '.7rem', color: '#888', marginTop: '.25rem' }}>
+                            <p style={{ fontSize: '1rem', color: '#888', marginTop: '.25rem' }}>
                                 GST @{gstRate}% {gstIn ? ` - GSTIN: ${gstIn}` : ''}
                             </p>
                         )}
 
                         {settings?.fssaiNo && (
-                            <p style={{ fontSize: '.7rem', color: '#888', marginTop: '.1rem' }}>
+                            <p style={{ fontSize: '1rem', color: '#888', marginTop: '.1rem' }}>
                                 FSSAI No: {settings.fssaiNo}
                             </p>
                         )}
 
-                        <p style={{ fontSize: '.75rem', color: '#888', marginTop: '.25rem', fontWeight: 700 }}>
+                        <p style={{ fontSize: '1.6rem', color: '#111', marginTop: '.45rem', fontWeight: 700, letterSpacing: '.5px' }}>
                             Bill No: {billNo ? `${(settings?.billPrefix ?? '')}${String(billNo).padStart(Number(settings?.billPadding) || 0, '0')}` : '—'}
                         </p>
 
@@ -424,11 +424,11 @@ export default function BillModal({ table, onClose }) {
 
                         <div key={ord.id} style={{ marginBottom: '1rem', borderBottom: idx < tableOrders.length - 1 ? '1px dashed #ddd' : 'none', paddingBottom: '.5rem' }}>
 
-                            <div style={{ fontSize: '.75rem', fontWeight: 700, color: '#888', marginBottom: '.25rem' }}>Ticket #{ord.id}</div>
+                            <div style={{ fontSize: '1rem', fontWeight: 700, color: '#888', marginBottom: '.3rem' }}>Ticket #{ord.id}</div>
 
                             {ord.items.map((item, i) => (
 
-                                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.875rem', marginBottom: '.2rem' }}>
+                                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.25rem', marginBottom: '.3rem' }}>
 
                                     <div style={{ flex: 1, minWidth: 0 }}>
 
@@ -438,7 +438,7 @@ export default function BillModal({ table, onClose }) {
                                             const variants = item.customizations?.variants ? Object.keys(item.customizations.variants).filter(k => item.customizations.variants[k].name).map(k => item.customizations.variants[k].name) : [];
                                             const addons = item.customizations?.addons ? Object.keys(item.customizations.addons).filter(k => item.customizations.addons[k].name).map(k => item.customizations.addons[k].name) : [];
                                             const mods = [...variants, ...addons];
-                                            if (mods.length) return <div style={{ fontSize: '.75rem', color: '#666', marginTop: '.15rem' }}>{mods.join(', ')}</div>;
+                                            if (mods.length) return <div style={{ fontSize: '1.05rem', color: '#666', marginTop: '.15rem' }}>{mods.join(', ')}</div>;
                                             return null;
                                         })()}
 
@@ -451,10 +451,14 @@ export default function BillModal({ table, onClose }) {
                                                 if (veg) tag += `[${veg}] `;
                                                 if (spice) tag += `${spice} `;
                                                 if (cost) tag += `cost ${cost.toFixed(2)}`;
-                                                return <div style={{ fontSize: '.7rem', color: '#888', marginTop: '.1rem' }}>{tag.trim()}</div>;
+                                                return <div style={{ fontSize: '1rem', color: '#888', marginTop: '.1rem' }}>{tag.trim()}</div>;
                                             }
                                             return null;
                                         })()}
+
+                                        {item.customizationString && (
+                                            <div style={{ fontSize: '1rem', color: '#8B4513', marginTop: '.1rem', fontWeight: 600 }}>Note: {item.customizationString}</div>
+                                        )}
 
                                     </div>
 
@@ -472,7 +476,7 @@ export default function BillModal({ table, onClose }) {
 
                     <div style={{ borderTop: '1px dashed #ddd', paddingTop: '.75rem', marginTop: '.75rem' }}>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8125rem', color: '#555', marginBottom: '.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.15rem', color: '#555', marginBottom: '.5rem' }}>
 
                             <span>Subtotal</span>
 
@@ -482,7 +486,7 @@ export default function BillModal({ table, onClose }) {
 
                         {gstEnabled && gstAmount > 0 && (
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8125rem', color: '#555', marginBottom: '.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.15rem', color: '#555', marginBottom: '.5rem' }}>
 
                                 <span>GST @{gstRate}%{gstIn ? ` (${gstIn})` : ''}</span>
 
@@ -494,7 +498,7 @@ export default function BillModal({ table, onClose }) {
 
                         {serviceChargeEnabled && scAmount > 0 && (
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8125rem', color: '#555', marginBottom: '.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.15rem', color: '#555', marginBottom: '.5rem' }}>
 
                                 <span>Svc.Charge @{serviceChargePercent}%</span>
 
@@ -506,7 +510,7 @@ export default function BillModal({ table, onClose }) {
 
                         {discountNum > 0 && (
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8125rem', color: '#b91c1c', marginBottom: '.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.15rem', color: '#b91c1c', marginBottom: '.5rem' }}>
 
                                 <span>Discount</span>
 
@@ -516,7 +520,7 @@ export default function BillModal({ table, onClose }) {
 
                         )}
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1rem', fontWeight: 700, borderTop: '1px solid #111', paddingTop: '.5rem', color: '#111' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.5rem', fontWeight: 700, borderTop: '1px solid #111', paddingTop: '.5rem', color: '#111' }}>
 
                             <span>Grand Total</span>
 
@@ -530,17 +534,17 @@ export default function BillModal({ table, onClose }) {
                     {/* UPI QR — ONE clean block: label + centered QR. Lives INSIDE printable-receipt so it prints on the bill too. */}
                     {paymentMode === 'UPI' && selectedQr && (
                         <div style={{ textAlign: 'center', marginTop: '.75rem', paddingTop: '.75rem', borderTop: '1px dashed #ddd' }}>
-                            <p style={{ fontSize: '.8rem', fontWeight: 700, color: '#111', marginBottom: '.5rem' }}>
+                            <p style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111', marginBottom: '.5rem' }}>
                                 Scan to pay{selectedQr.label ? ` • ${selectedQr.label}` : ''}
                             </p>
-                            <img src={selectedQr.path} alt={`UPI QR — ${selectedQr.label || 'Pay'}`} style={{ width: '140px', height: '140px', objectFit: 'contain', background: '#fff', borderRadius: '8px', border: '1px solid #ddd', display: 'block', margin: '0 auto' }} />
+                            <img src={selectedQr.path} alt={`UPI QR — ${selectedQr.label || 'Pay'}`} style={{ width: '150px', height: '150px', objectFit: 'contain', background: '#fff', borderRadius: '8px', border: '1px solid #ddd', display: 'block', margin: '0 auto' }} />
                         </div>
                     )}
 
                     {/* Thank-you footer — prints on every bill */}
                     <div style={{ textAlign: 'center', marginTop: '.9rem', paddingTop: '.75rem', borderTop: '1px dashed #ddd' }}>
-                        <p style={{ fontSize: '.95rem', fontWeight: 700, color: '#111', margin: 0 }}>Thank You! Visit Again 🙏</p>
-                        <p style={{ fontSize: '.78rem', color: '#666', margin: '.3rem 0 0' }}>— {settings?.cafeName || 'La Casa'} • Come back soon —</p>
+                        <p style={{ fontSize: '1.35rem', fontWeight: 700, color: '#111', margin: 0 }}>Thank You! Visit Again 🙏</p>
+                        <p style={{ fontSize: '1.05rem', color: '#666', margin: '.3rem 0 0' }}>— {settings?.cafeName || 'La Casa'} • Come back soon —</p>
                     </div>
                 </div>
                 {/* discount + payment mode — OUTSIDE printable-receipt (interactive UI, not printed) */}

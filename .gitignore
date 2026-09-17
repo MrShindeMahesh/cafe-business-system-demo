@@ -21,6 +21,9 @@ server/cafe.db
 server/cafe.db-*
 server/backups/
 
+# deploy zips are build artifacts — regenerate with scripts, don't version them
+*.zip
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
