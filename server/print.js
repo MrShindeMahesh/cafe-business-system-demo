@@ -48,8 +48,8 @@ const alignCenter = `${ESC}a\x01`;
 const alignLeft = `${ESC}a\x00`;
 const boldOn = `${ESC}E\x01`;
 const boldOff = `${ESC}E\x00`;
-const doubleH = `${ESC}d\x01`;                // double height
-const normalSize = `${ESC}d\x00`;
+const doubleH = `${ESC}!${String.fromCharCode(0x30)}`;    // BIG: bold + double width + double height
+const normalSize = `${ESC}!${String.fromCharCode(0x00)}`; // back to normal print mode
 const cut = `${ESC}i`;
 const feed = (n) => `${ESC}d${String.fromCharCode(n)}`;
 
@@ -207,6 +207,7 @@ export async function printReceipt({ table, orders: tableOrders, settings: custo
   if (contact) out += alignCenter + `Ph: ${contact}\n`;
   out += alignCenter + boldOn + '*** CASH BILL ***' + boldOff + '\n';
   out += alignLeft + `Table: ${tNum}   GSTIN: ${gstIn}\n`;
+  if (settings.fssaiNo) out += alignLeft + `FSSAI No: ${settings.fssaiNo}\n`;
   out += `Date: ${now}\n`;
   out += `Bill No: ${billNoLabel}\n`;
   out += `Tickets: ${tableOrders.length}\n`;

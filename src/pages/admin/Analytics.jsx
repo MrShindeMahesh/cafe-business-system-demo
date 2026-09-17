@@ -77,12 +77,13 @@ export default function Analytics() {
   const totalOrders = filteredOrders.length;
   const averageOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(0) : 0;
 
-  // Tables — total count + how many are occupied right now (active, unsettled orders)
-  const occupiedTables = new Set(
-    orders
-      .filter((o) => o.status !== 'SERVED' && o.status !== 'CANCELLED')
-      .map((o) => parseInt(String(o.tableId).replace(/\D/g, ''), 10))
-      .filter(Number.isFinite)
+  // Tables settled today — how many distinct tables we sold/settled today (from payment records)
+  const todayKey = new Date().toLocaleDateString('en-IN');
+  const tablesSettledToday = new Set(
+    (payments || [])
+      .filter((p) => p.settledAt && new Date(p.settledAt).toLocaleDateString('en-IN') === todayKey)
+      .map((p) => String(p.tableId || '').toUpperCase())
+      .filter((t) => t && t !== 'PARCEL')
   ).size;
 
   // 3. Aggregate Item Stats for the charts
@@ -325,10 +326,10 @@ export default function Analytics() {
         </div>
 
         <div className="kpi-card">
-          <div className="kpi-label"><Grid size={14} style={{display:'inline', verticalAlign:'middle'}}/> Tables</div>
+          <div className="kpi-label"><Grid size={14} style={{display:'inline', verticalAlign:'middle'}}/> Tables Settled Today</div>
           <div>
-            <span className="kpi-value">{tables.length}</span>
-            <span style={{ fontSize: '.78rem', color: 'var(--color-text-muted)', marginLeft: '.5rem' }}>{occupiedTables} occupied now</span>
+            <span className="kpi-value">{tablesSettledToday}</span>
+            <span style={{ fontSize: '.78rem', color: 'var(--color-text-muted)', marginLeft: '.5rem' }}>of {tables.length} tables</span>
           </div>
         </div>
 

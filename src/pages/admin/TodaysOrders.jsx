@@ -231,11 +231,12 @@ export default function TodaysOrders() {
             '<div style="background:#fff;color:#111;padding:1rem">' +
             '<div style="text-align:center;margin-bottom:1rem">' +
                 (s.cafeLogo ? '<img src="' + s.cafeLogo + '" alt="logo" style="width:56px;height:56px;object-fit:contain;margin:0 auto 4px;display:block" />' : '') +
-                '<h4 style="font-size:1.2rem;font-weight:700;margin:4px 0">' + (s.cafeName || 'La Casa') + '</h4>' +
+                '<h4 style="font-size:1.6rem;font-weight:700;margin:4px 0">' + (s.cafeName || 'La Casa') + '</h4>' +
                 '<p style="font-size:.75rem;color:#666">' + (isParcel ? 'Parcel (Takeaway)' : 'Table #' + String(ord.tableId)) + ' • 1 Ticket(s)</p>' +
                 '<p style="font-size:.75rem;color:#666">' + new Date(billDate).toLocaleString() + '</p>' +
                 (s.contact ? '<p style="font-size:.75rem;color:#666;margin-top:.15rem">Ph: ' + s.contact + '</p>' : '') +
                 (gstEnabled ? '<p style="font-size:.7rem;color:#888;margin-top:.25rem">GST @' + gstRate + '%' + (gstIn ? ' - GSTIN: ' + gstIn : '') + '</p>' : '') +
+                (s.fssaiNo ? '<p style="font-size:.7rem;color:#888;margin-top:.1rem">FSSAI No: ' + s.fssaiNo + '</p>' : '') +
                 '<p style="font-size:.75rem;color:#888;margin-top:.25rem;font-weight:700">Bill No: ' + billNoLabel + '</p>' +
             '</div>' +
             '<div style="margin-bottom:1rem;border-bottom:1px dashed #ddd;padding-bottom:.5rem">' +

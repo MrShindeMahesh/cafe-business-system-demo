@@ -386,7 +386,7 @@ export default function BillModal({ table, onClose }) {
 
                         )}
 
-                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', fontWeight: 700, margin: '4px 0' }}>
+                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', fontWeight: 700, margin: '4px 0' }}>
 
                             {settings?.cafeName || 'La Casa'}
 
@@ -403,6 +403,12 @@ export default function BillModal({ table, onClose }) {
                         {gstEnabled && (
                             <p style={{ fontSize: '.7rem', color: '#888', marginTop: '.25rem' }}>
                                 GST @{gstRate}% {gstIn ? ` - GSTIN: ${gstIn}` : ''}
+                            </p>
+                        )}
+
+                        {settings?.fssaiNo && (
+                            <p style={{ fontSize: '.7rem', color: '#888', marginTop: '.1rem' }}>
+                                FSSAI No: {settings.fssaiNo}
                             </p>
                         )}
 

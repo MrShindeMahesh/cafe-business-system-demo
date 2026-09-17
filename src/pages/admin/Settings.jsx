@@ -343,6 +343,11 @@ export default function Settings() {
                                 <input type="text" value={localSettings.gstIn || ''} onChange={e => setLocalSettings({ ...localSettings, gstIn: e.target.value })} placeholder="22AAAAA0000A1Z5" style={{ flex: 1, padding: '.45rem .5rem', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', fontSize: '.9rem', fontFamily: 'monospace', letterSpacing: '.05em' }} />
                               </div>
 
+                              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '.25rem', flex: '0 0 110px' }}>FSSAI No</label>
+                                <input type="text" value={localSettings.fssaiNo || ''} onChange={e => setLocalSettings({ ...localSettings, fssaiNo: e.target.value })} placeholder="FSSAI license number" style={{ flex: 1, padding: '.45rem .5rem', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', fontSize: '.9rem', fontFamily: 'monospace', letterSpacing: '.05em' }} />
+                              </div>
+
                               <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '1rem 0' }} />
 
                               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
