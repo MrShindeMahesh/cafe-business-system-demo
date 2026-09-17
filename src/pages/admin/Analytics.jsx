@@ -77,14 +77,15 @@ export default function Analytics() {
   const totalOrders = filteredOrders.length;
   const averageOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(0) : 0;
 
-  // Tables settled today — how many distinct tables we sold/settled today (from payment records)
+  // Tables settled/sold today — one count per settled table bill today (parcel excluded),
+  // so a table that turns over twice in a day counts as 2 tables sold.
   const todayKey = new Date().toLocaleDateString('en-IN');
-  const tablesSettledToday = new Set(
-    (payments || [])
-      .filter((p) => p.settledAt && new Date(p.settledAt).toLocaleDateString('en-IN') === todayKey)
-      .map((p) => String(p.tableId || '').toUpperCase())
-      .filter((t) => t && t !== 'PARCEL')
-  ).size;
+  const tableBillsToday = (payments || []).filter((p) => {
+    const t = String(p.tableId || '').toUpperCase();
+    return p.settledAt && t && t !== 'PARCEL' && new Date(p.settledAt).toLocaleDateString('en-IN') === todayKey;
+  });
+  const tablesSoldToday = tableBillsToday.length;
+  const uniqueTablesToday = new Set(tableBillsToday.map((p) => String(p.tableId || '').toUpperCase())).size;
 
   // 3. Aggregate Item Stats for the charts
   const itemStats = useMemo(() => {
@@ -326,10 +327,12 @@ export default function Analytics() {
         </div>
 
         <div className="kpi-card">
-          <div className="kpi-label"><Grid size={14} style={{display:'inline', verticalAlign:'middle'}}/> Tables Settled Today</div>
+          <div className="kpi-label"><Grid size={14} style={{display:'inline', verticalAlign:'middle'}}/> Tables Sold Today</div>
           <div>
-            <span className="kpi-value">{tablesSettledToday}</span>
-            <span style={{ fontSize: '.78rem', color: 'var(--color-text-muted)', marginLeft: '.5rem' }}>of {tables.length} tables</span>
+            <span className="kpi-value">{tablesSoldToday}</span>
+            <span style={{ fontSize: '.78rem', color: 'var(--color-text-muted)', marginLeft: '.5rem' }}>
+              {uniqueTablesToday} of {tables.length} tables used
+            </span>
           </div>
         </div>
 
