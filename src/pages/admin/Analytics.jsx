@@ -77,15 +77,33 @@ export default function Analytics() {
   const totalOrders = filteredOrders.length;
   const averageOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(0) : 0;
 
-  // Tables settled/sold today — one count per settled table bill today (parcel excluded),
-  // so a table that turns over twice in a day counts as 2 tables sold.
-  const todayKey = new Date().toLocaleDateString('en-IN');
-  const tableBillsToday = (payments || []).filter((p) => {
-    const t = String(p.tableId || '').toUpperCase();
-    return p.settledAt && t && t !== 'PARCEL' && new Date(p.settledAt).toLocaleDateString('en-IN') === todayKey;
-  });
-  const tablesSoldToday = tableBillsToday.length;
-  const uniqueTablesToday = new Set(tableBillsToday.map((p) => String(p.tableId || '').toUpperCase())).size;
+  // Tables SERVED today — each table counts ONCE, no matter how many orders or
+  // bills it had: 2 orders on table 4 (and no other table used) = 1 table served.
+  // A table counts if it was billed/settled today OR an order was placed on it
+  // today. PARCEL is takeaway, so it never counts as a table.
+  // Table numbers are stored inconsistently (e.g. "03" vs "3"), so every table
+  // number is normalized to its digits before comparing → "03" === "3".
+  const dayKeyOf = (iso) => (iso ? new Date(iso).toLocaleDateString('en-IN') : null);
+  const tableNo = (t) => {
+    const m = String(t ?? '').trim().match(/\d+/);
+    return m ? String(Number(m[0])) : '';       // '03'/'T05' → '3'/'5'
+  };
+  const isRealTable = (t) => tableNo(t) !== '' && String(t ?? '').toUpperCase().trim() !== 'PARCEL';
+  const todayKey = dayKeyOf(new Date().toISOString());
+
+  const todaysTableOrders = (orders || []).filter(
+    (o) => o.status !== 'CANCELLED' && isRealTable(o.tableId) && dayKeyOf(o.createdAt) === todayKey
+  );
+  const tableBillsToday = (payments || []).filter(
+    (p) => p.settledAt && isRealTable(p.tableId) && dayKeyOf(p.settledAt) === todayKey
+  );
+  const tablesServedToday = new Set([
+    ...todaysTableOrders.map((o) => tableNo(o.tableId)),
+    ...tableBillsToday.map((p) => tableNo(p.tableId)),
+  ]).size;
+  const ticketsToday = todaysTableOrders.length;
+  const billsToday = tableBillsToday.length;
+
 
   // 3. Aggregate Item Stats for the charts
   const itemStats = useMemo(() => {
@@ -326,12 +344,12 @@ export default function Analytics() {
           </div>
         </div>
 
-        <div className="kpi-card">
-          <div className="kpi-label"><Grid size={14} style={{display:'inline', verticalAlign:'middle'}}/> Tables Sold Today</div>
+                        <div className="kpi-card">
+          <div className="kpi-label"><Grid size={14} style={{display:'inline', verticalAlign:'middle'}}/> Tables Served Today</div>
           <div>
-            <span className="kpi-value">{tablesSoldToday}</span>
+            <span className="kpi-value">{tablesServedToday}</span>
             <span style={{ fontSize: '.78rem', color: 'var(--color-text-muted)', marginLeft: '.5rem' }}>
-              {uniqueTablesToday} of {tables.length} tables used
+              {ticketsToday} ticket(s) · {billsToday} bill(s) settled
             </span>
           </div>
         </div>
