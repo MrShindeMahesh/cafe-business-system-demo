@@ -46,6 +46,27 @@ curl -X POST --data-binary @data.db -H "Content-Type: application/octet-stream" 
 Set the printer IP + port in Settings (printer section). With no IP configured,
 bills are logged to `server/logs/print.log` so nothing is lost while testing.
 
+## Updating an existing install
+Two zips are produced for this project:
+
+| Zip | Contents | Use it for |
+|---|---|---|
+| `cafe-deploy-YYYY-MM-DD.zip` | full project (`Cafe/` folder: `src`, `dist`, `public`, `server`, launcher `.bat` files, `cafe.ico`, backup DBs) | a **fresh** machine — unzip, `npm install`, `npm start` |
+| `cafe-app-update.zip` | only `dist/` + `server/server.js`, `server/db.js`, `server/print.js` | an **already deployed** cafe — drop it over the existing folder, then restart the server |
+
+Never overwrite `server/cafe.db` when updating — that file is the live data.
+
+## Bill numbers
+- One number per **bill** (a table's several tickets share it), starting at 1 each day.
+- Assigned once, the first time the bill is opened/printed, and stored on the tickets —
+  reprints always show the same number.
+- The daily counter lives in private settings rows `_billDay` / `_billSeq`
+  (hidden from the API) so a bill printed after midnight continues today's sequence
+  instead of reusing number 1. A ticket taken yesterday but billed today gets today's number.
+- Padding/prefix come from Settings → Bill (e.g. padding 3 → `001`).
+- A full order sync (the 5-second poll writes the whole list back) keeps the stored
+  bill numbers, so reprints never lose them.
+
 ## Keeping it running (optional)
 ```bash
 # pm2
