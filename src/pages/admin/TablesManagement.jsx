@@ -46,11 +46,18 @@ export default function TablesManagement() {
   // Color each floor tile by table-number band (1-10 / 11-20 / 21-30 / 31-40 /
   // 41-50) so table clusters are instantly recognizable. A table that turns over
   // keeps its color (the band is by number, not status).
-  const BAND_COLORS = ['#C68B59', '#8B4513', '#A0522D', '#CD853F', '#6B4423'];
+    const BAND_COLORS = ['#C68B59', '#8B4513', '#A0522D', '#CD853F', '#6B4423'];
   const bandColor = (n) =>
     Number.isFinite(n) && n > 0
       ? BAND_COLORS[Math.min(Math.floor((n - 1) / 10), BAND_COLORS.length - 1)] || BAND_COLORS[BAND_COLORS.length - 1]
       : 'var(--color-primary)';
+  const legendBands = [
+    { label: '1-10', color: BAND_COLORS[0] },
+    { label: '11-20', color: BAND_COLORS[1] },
+    { label: '21-30', color: BAND_COLORS[2] },
+    { label: '31-40', color: BAND_COLORS[3] },
+    { label: '41-50', color: BAND_COLORS[4] },
+  ];
 
 
   return (
