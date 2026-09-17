@@ -378,6 +378,20 @@ export default function Settings() {
                                  </div>
                                </div>
 
+                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '.25rem' }}>
+                                  <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '.4rem', flex: '0 0 110px' }}>↺ Reset Bills</label>
+                                  <button className="btn btn-outline btn-sm" onClick={async () => {
+                                    if (!window.confirm("Reset today's bill counter?\n\nNext bill will print 1 again. Old bills keep their numbers.")) return;
+                                    try {
+                                      const res = await fetch('/api/bills/reset-today', { method: 'POST' });
+                                      const data = await res.json();
+                                      if (data.ok) alert('Done — next bill prints 1. (Day: ' + data.day + ')');
+                                      else alert('Reset failed: ' + (data.error || 'unknown'));
+                                    } catch (e) { alert('Reset failed: ' + e.message); }
+                                  }}>↺ Reset Today's Counter</button>
+                                  <span style={{ fontSize: '.7rem', color: 'var(--color-text-muted)' }}>start-of-day trial + fresh service</span>
+                                </div>
+
                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '.25rem' }}>
                                 <label style={{ fontSize: '.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '.4rem', flex: '0 0 110px' }}>🎁 Tip Allowed</label>
                                 <label style={{ position: 'relative', display: 'inline-block', width: '48px', height: '26px', flexShrink: 0, cursor: 'pointer' }}>

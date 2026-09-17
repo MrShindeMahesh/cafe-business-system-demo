@@ -114,6 +114,19 @@ app.post('/api/bills/assign', (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+
+// POST /api/bills/reset-today — reset today's bill counter (Settings button).
+// Next bill prints 1 again. Old orders/bill numbers are never touched.
+app.post('/api/bills/reset-today', (req, res) => {
+  try {
+    const ds = dayStamp(new Date());
+    setSettingRaw('_billDay', ds);
+    setSettingRaw('_billSeq', 0);
+    res.json({ ok: true, day: ds, seq: 0 });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 const normVeg = (v) => (v === false || v === 'N') ? 'N' : 'V';
 const rowMenu = (r) => ({
   id: r.id, name: r.name, category: r.category, price: r.price, description: r.description,

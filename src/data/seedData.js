@@ -16,7 +16,7 @@ export const defaultTables = Array.from({ length: 50 }, (_, i) => ({
 export const defaultSettings = {
   cafeName: 'La Casa',
   contact: '+91 9876543210',
-  address: 'Nagpur, Maharashtra',
+  address: 'CIDCO Cannought, M G M, Chhatrapati Sambhajinagar, Maharashtra 431003',
   upiQr: '',
   // Tax & billing — Phase 1
   gstEnabled: false,
@@ -25,6 +25,7 @@ export const defaultSettings = {
   serviceChargeEnabled: false,
   serviceChargePercent: 5,
   tipEnabled: false,
+  fssaiNo: '21526044005511',
   // Bill serial number configuration — numbering restarts at 1 every day
   // (first bill of the day = 1). Prefix/padding are optional cosmetics.
   billCounter: 0,

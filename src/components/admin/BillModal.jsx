@@ -386,11 +386,15 @@ export default function BillModal({ table, onClose }) {
 
                         )}
 
-                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', fontWeight: 700, margin: '4px 0' }}>
+                        <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.4rem', fontWeight: 800, margin: '4px 0', letterSpacing: '.08em', textTransform: 'uppercase' }}>
 
                             {settings?.cafeName || 'La Casa'}
 
                         </h4>
+
+                        {settings?.address && (
+                            <p style={{ fontSize: '.8rem', color: '#666', marginTop: '.15rem', lineHeight: 1.4 }}>{settings.address}</p>
+                        )}
 
                         <p style={{ fontSize: '.75rem', color: '#666' }}>{isParcel ? 'Parcel (Takeaway)' : `Table #${table.number}`} • {tableOrders.length} Ticket(s)</p>
 

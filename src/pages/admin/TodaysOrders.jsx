@@ -232,7 +232,8 @@ export default function TodaysOrders() {
             '<div style="background:#fff;color:#111;padding:1rem">' +
             '<div style="text-align:center;margin-bottom:1rem">' +
                 (s.cafeLogo ? '<img src="' + s.cafeLogo + '" alt="logo" style="width:56px;height:56px;object-fit:contain;margin:0 auto 4px;display:block" />' : '') +
-                '<h4 style="font-size:1.6rem;font-weight:700;margin:4px 0">' + (s.cafeName || 'La Casa') + '</h4>' +
+                '<h4 style="font-size:2.4rem;font-weight:800;margin:4px 0;letter-spacing:.08em;text-transform:uppercase">' + (s.cafeName || 'La Casa') + '</h4>' +
+                (s.address ? '<p style="font-size:.8rem;color:#666;margin-top:.15rem;line-height:1.4">' + s.address + '</p>' : '') +
                 '<p style="font-size:.75rem;color:#666">' + (isParcel ? 'Parcel (Takeaway)' : 'Table #' + String(ord.tableId)) + ' • 1 Ticket(s)</p>' +
                 '<p style="font-size:.75rem;color:#666">' + new Date(billDate).toLocaleString() + '</p>' +
                 (s.contact ? '<p style="font-size:.75rem;color:#666;margin-top:.15rem">Ph: ' + s.contact + '</p>' : '') +

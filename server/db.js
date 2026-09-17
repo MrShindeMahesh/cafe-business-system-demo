@@ -228,4 +228,19 @@ if (!orderCols.includes('bill_no')) {
   console.log('✔ orders table: added bill_no column');
 }
 
+// Backfill any NEW defaultSettings keys into EXISTING databases.
+// Old DBs were seeded before the key existed (e.g. fssaiNo) — without this,
+// the bill's `{settings?.fssaiNo && ...}` guard stays false and the line
+// silently disappears on machines that already have data.
+{
+  const existingKeys = new Set(db.prepare('SELECT key FROM settings').all().map((r) => r.key));
+  const ins = db.prepare('INSERT INTO settings (key,value) VALUES (?,?)');
+  for (const [k, v] of Object.entries(defaultSettings)) {
+    if (!existingKeys.has(k)) {
+      ins.run(k, String(v));
+      console.log(`✔ settings: backfilled missing key '${k}'`);
+    }
+  }
+}
+
 console.log('✔ SQLite database ready:', dbPath);

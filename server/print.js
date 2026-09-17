@@ -49,6 +49,7 @@ const alignLeft = `${ESC}a\x00`;
 const boldOn = `${ESC}E\x01`;
 const boldOff = `${ESC}E\x00`;
 const doubleH = `${ESC}!${String.fromCharCode(0x30)}`;    // BIG: bold + double width + double height
+const doubleW = `${ESC}!${String.fromCharCode(0x20)}`;    // double width (for the cafe name line)
 const normalSize = `${ESC}!${String.fromCharCode(0x00)}`; // back to normal print mode
 const cut = `${ESC}i`;
 const feed = (n) => `${ESC}d${String.fromCharCode(n)}`;
@@ -163,7 +164,7 @@ const row = (l, r) => {
   return (l.length > avail ? l.slice(0, avail) : l.padEnd(avail)) + r;
 };
 
-export async function printReceipt({ table, orders: tableOrders, settings: customSettings, billNo: preassigned }) {
+export function buildReceiptPreview({ table, orders: tableOrders, settings: customSettings, billNo: preassigned }) {
   const settingsIn = customSettings || getSettings();
   const settings = settingsIn;
 
@@ -219,9 +220,20 @@ export async function printReceipt({ table, orders: tableOrders, settings: custo
   const line = '-'.repeat(W);
 
   // ---- header ----
-  let out = init + alignCenter + boldOn + doubleH + cafe + normalSize + boldOff + '\n';
+  let out = init + alignCenter + boldOn + doubleH + doubleW + cafe + normalSize + boldOff + '\n';
   const contact = String(settings.contact || '').trim();
   if (contact) out += alignCenter + `Ph: ${contact}\n`;
+  const addr = String(settings.address || '').trim();
+  if (addr) {
+    // word-wrap address to 32-col thermal width
+    const words = addr.split(/\s+/);
+    let line = '';
+    for (const w of words) {
+      if ((line + ' ' + w).trim().length > 32) { out += alignCenter + line.trim() + '\n'; line = w; }
+      else line += ' ' + w;
+    }
+    if (line.trim()) out += alignCenter + line.trim() + '\n';
+  }
   out += alignCenter + boldOn + '*** CASH BILL ***' + boldOff + '\n';
   out += alignLeft + `Table: ${tNum}   GSTIN: ${gstIn}\n`;
   if (settings.fssaiNo) out += alignLeft + `FSSAI No: ${settings.fssaiNo}\n`;
@@ -280,6 +292,16 @@ export async function printReceipt({ table, orders: tableOrders, settings: custo
   out += alignCenter + boldOn + 'Thank You! Visit Again' + boldOff + '\n';
   out += alignCenter + `- ${cafe} - Come back soon -` + '\n';
   out += feed(3) + cut;
+
+  return { out, billNo, grandTotal, billNoLabel };
+}
+
+export async function printReceipt(args) {
+  const { out, billNo, grandTotal } = buildReceiptPreview(args);
+  const settings = args.settings || getSettings();
+  const ip = settings.printerIp;
+  const tNum = String(args.table?.number || args.table?.id || '').replace(/\D/g, '') || '?';
+  const tableOrders = args.orders || [];
 
   if (!ip) {
     const dir = ensureLogDir();
