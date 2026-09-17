@@ -48,8 +48,7 @@ const alignCenter = `${ESC}a\x01`;
 const alignLeft = `${ESC}a\x00`;
 const boldOn = `${ESC}E\x01`;
 const boldOff = `${ESC}E\x00`;
-const doubleH = `${ESC}!${String.fromCharCode(0x30)}`;    // BIGGEST: bold + double width + double height
-const doubleHt = `${ESC}!${String.fromCharCode(0x10)}`;   // BIG: double height only — keeps the 32-column layout intact
+const doubleH = `${ESC}!${String.fromCharCode(0x30)}`;    // BIG: bold + double width + double height
 const normalSize = `${ESC}!${String.fromCharCode(0x00)}`; // back to normal print mode
 const cut = `${ESC}i`;
 const feed = (n) => `${ESC}d${String.fromCharCode(n)}`;
@@ -172,9 +171,8 @@ export async function printReceipt({ table, orders: tableOrders, settings: custo
   // Reprints pass the stored number (or the orders already carry it), so the
   // same bill always prints with the same number.
   // Fallback for direct calls (e.g. a test print): use the SAME daily sequence the
-  // server uses (private `_billDay` / `_billSeq` settings). The old fallback read the
-  // legacy `billCounter` setting, which could be stale (e.g. "0111") and would then
-  // print an unrelated number — never do that again.
+  // server keeps in the private `_billDay`/`_billSeq` settings. The old fallback used
+  // the stale legacy `billCounter` setting (e.g. "0111") and printed a wrong number.
   const nextDailyBillNo = () => {
     const stamp = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     const today = stamp(new Date());
@@ -221,17 +219,14 @@ export async function printReceipt({ table, orders: tableOrders, settings: custo
   const line = '-'.repeat(W);
 
   // ---- header ----
-  // `doubleHt` turns on DOUBLE-HEIGHT for the whole bill (bigger, easier to read
-  // at the counter) while keeping the 32-column layout intact — every line below
-  // inherits it, and the cafe name is printed even bigger on top of it.
-  let out = init + alignCenter + doubleHt + boldOn + doubleH + cafe + doubleHt + boldOff + '\n';
+  let out = init + alignCenter + boldOn + doubleH + cafe + normalSize + boldOff + '\n';
   const contact = String(settings.contact || '').trim();
   if (contact) out += alignCenter + `Ph: ${contact}\n`;
   out += alignCenter + boldOn + '*** CASH BILL ***' + boldOff + '\n';
   out += alignLeft + `Table: ${tNum}   GSTIN: ${gstIn}\n`;
   if (settings.fssaiNo) out += alignLeft + `FSSAI No: ${settings.fssaiNo}\n`;
   out += `Date: ${now}\n`;
-  out += boldOn + doubleH + `Bill No: ${billNoLabel}` + doubleHt + boldOff + '\n';
+  out += `Bill No: ${billNoLabel}\n`;
   out += `Tickets: ${tableOrders.length}\n`;
   out += line + '\n';
 
@@ -280,9 +275,9 @@ export async function printReceipt({ table, orders: tableOrders, settings: custo
   if (scAmount > 0) {
     out += row('Svc.Charge @ ' + serviceChargePercent + '%', `Rs.${scAmount}`) + '\n';
   }
-  out += boldOn + doubleH + row('GRAND TOTAL', `Rs.${grandTotal}`) + doubleHt + boldOff + '\n';
+  out += boldOn + doubleH + row('GRAND TOTAL', `Rs.${grandTotal}`) + normalSize + boldOff + '\n';
   out += line + '\n';
-  out += alignCenter + doubleHt + boldOn + 'Thank You! Visit Again' + boldOff + '\n';
+  out += alignCenter + boldOn + 'Thank You! Visit Again' + boldOff + '\n';
   out += alignCenter + `- ${cafe} - Come back soon -` + '\n';
   out += feed(3) + cut;
 

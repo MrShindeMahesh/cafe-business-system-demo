@@ -843,9 +843,6 @@
   /* hide everything EXCEPT the top-level print portal (display, not visibility —
      display:none on ancestors of the portal can't affect it since it's a direct
      child of <body>) */
-  html {
-    font-size: 20px !important;    /* scales every rem-sized line on the bill up (25% bigger than default) */
-  }
   body > *:not(#print-portal) {
     display: none !important;
   }
@@ -865,11 +862,11 @@
     border-radius: 0 !important;
     box-shadow: none !important;
     padding: 2mm 3mm !important;
-    font-size: 13.5px !important;
+    font-size: 11px !important;
     margin: 0 !important;
   }
   #print-portal #printable-receipt h4 {
-    font-size: 24px !important;
+    font-size: 16px !important;
   }
   @page {
     size: 80mm auto;              /* auto-height thermal roll */
